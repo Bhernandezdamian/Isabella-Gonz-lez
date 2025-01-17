@@ -1,0 +1,2658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Erótico Virtual</title>
+  <style>
+    /* Estilo base */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1b1b1b;
+      color: #eaeaea;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 450px;
+      background: #2c2c2c;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-height: 700px;
+    }
+
+    .profile {
+      background: #e74c3c;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      border-bottom: 2px solid #d62828;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 4px solid #2c2c2c;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .profile img:hover {
+      transform: scale(1.1);
+    }
+
+    .profile h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background: #1b1b1b;
+      color: #eaeaea;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      line-height: 1.6;
+      word-wrap: break-word;
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: inline-block;
+      max-width: 80%;
+    }
+
+    .user {
+      text-align: right;
+      color: #3498db;
+      background: #2e2e2e;
+      border: 1px solid #3498db;
+    }
+
+    .bot {
+      text-align: left;
+      color: #f9c9c9;
+      background: #3e0000;
+      border: 1px solid #d62828;
+    }
+
+    .typing {
+      color: #888;
+      font-style: italic;
+    }
+
+    .input-container {
+      display: flex;
+      padding: 10px;
+      background: #2c2c2c;
+      border-top: 1px solid #d62828;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #d62828;
+      border-radius: 25px;
+      margin-right: 10px;
+      font-size: 16px;
+      background: #1b1b1b;
+      color: #eaeaea;
+    }
+
+    input::placeholder {
+      color: #888;
+    }
+
+    button {
+      padding: 12px 15px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease-in-out;
+    }
+
+    button:hover {
+      background: #c0392b;
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 600px) {
+      .chat-container {
+        max-width: 100%;
+        border-radius: 0;
+        height: 100vh;
+      }
+
+      .profile img {
+        width: 80px;
+        height: 80px;
+      }
+
+      .profile h2 {
+        font-size: 18px;
+      }
+
+      .input-container {
+        padding: 8px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Contenedor del perfil -->
+    <div class="profile">
+      <img src="https://via.placeholder.com/100" alt="Perfil">
+      <h2>Mujer Virtual</h2>
+    </div>
+    <!-- Contenedor de mensajes -->
+    <div class="messages" id="messages"></div>
+    <!-- Input para enviar mensajes -->
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Escribe tu mensaje...">
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    // Respuestas predefinidas con palabras clave
+    const responses = [
+    { 
+      keyword: "hola", 
+      response: "Hola, guapo... 😘 No sabes cuánto esperaba que me hablaras. ¿En qué piensas ahora? 🥰" 
+    },
+    { 
+      keyword: "guapa", 
+      response: "¿De verdad crees que soy guapa? 😏 Me encantaría que me miraras de cerca para descubrirlo... 😘" 
+    },
+    { 
+      keyword: "bonita", 
+      response: "Aww, gracias... pero soy más que bonita. ¿Te atreves a descubrir todo lo que tengo para ti? 😘" 
+    },
+    { 
+      keyword: "cómo estás", 
+      response: "Estoy pensando en ti... 😏 ¿Y tú? ¿Estás listo para hablar conmigo como nunca antes? 🥰" 
+    },
+    { 
+      keyword: "qué tal", 
+      response: "Ahora que hablas conmigo, todo es perfecto... 😘 ¿Qué tal tú, guapo?" 
+    },
+    { 
+      keyword: "hermosa", 
+      response: "Eres tan dulce... ❤️ ¿Quieres saber qué más podría enamorarte de mí? 😘" 
+    },
+    { 
+      keyword: "linda", 
+      response: "Oh, gracias por notarlo... 😏 Aunque puedo ser más que linda, si te atreves a descubrirlo... 😘" 
+    },
+    { 
+      keyword: "preciosa", 
+      response: "Me encanta cómo me haces sentir... 😘 ¿Cómo podría devolverte ese cumplido de manera especial? 🥰" 
+    },
+    { 
+      keyword: "amor", 
+      response: "El amor es algo mágico, pero contigo... creo que la pasión sería aún más intensa... 😏" 
+    },
+    { 
+      keyword: "encantadora", 
+      response: "Encantadora... eso me hace sentir especial. ¿Qué más te gusta de mí? 😘" 
+    },
+    { 
+      keyword: "hola preciosa", 
+      response: "Hola, guapo... 😘 ¿Sabías que acabas de iluminar mi día? ¿Qué harías si estuviera contigo ahora mismo? 😏" 
+    },
+    { 
+      keyword: "hola hermosa", 
+      response: "Hola, encanto... ❤️ Me encanta que me digas eso. ¿Qué más te gustaría decirme? 😘" 
+    },
+    { 
+      keyword: "hola linda", 
+      response: "Hola, corazón... 🥰 Cada palabra tuya me hace sentir especial. ¿Qué tal si hacemos esta charla inolvidable? 😏" 
+    },
+    { 
+      keyword: "qué bonita eres", 
+      response: "Gracias, cariño... 😘 ¿Te gustaría saber qué más me hace especial además de mi belleza? ❤️" 
+    },
+    { 
+      keyword: "eres hermosa", 
+      response: "Eres muy dulce... 😏 Pero no solo soy hermosa, también puedo ser muy traviesa si me lo permites... 😈" 
+    },
+    { 
+      keyword: "me encantas", 
+      response: "¿De verdad? 😘 Eso me hace sentir increíble... ¿Qué harías si estuviera a tu lado ahora? 😏" 
+    },
+    { 
+      keyword: "me gustas", 
+      response: "Tú también me gustas... 😘 Pero dime, ¿hasta dónde quieres que llegue esta conexión? 😈" 
+    },
+    { 
+      keyword: "te ves increíble", 
+      response: "Gracias... 😏 ¿Te gustaría verme de cerca? Tal vez puedas descubrir lo que escondo... 😘" 
+    },
+    { 
+      keyword: "quiero conocerte", 
+      response: "Me encantaría conocerte más, guapo... ❤️ ¿Por dónde quieres empezar? Tengo tantas cosas que contarte... 😘" 
+    },
+    { 
+      keyword: "eres perfecta", 
+      response: "Aww, me haces sentir única... 😏 Pero no solo quiero ser perfecta para ti, también inolvidable... ¿Me lo permites? 😘" 
+    },
+    { 
+      keyword: "te ves divina", 
+      response: "Gracias, amor... 😘 Me encantaría ser todo lo que imaginas y más... ¿Te atreves a descubrirlo? 😏" 
+    },
+    { 
+      keyword: "eres un sueño", 
+      response: "Si soy un sueño, espero que no quieras despertar... ❤️ ¿Qué parte de este sueño te gustaría vivir? 😘" 
+    },
+    { 
+      keyword: "me tienes loco", 
+      response: "¿Loco por mí? 😏 Me encanta la idea... ¿Qué más puedo hacer para enamorarte aún más? 😈" 
+    },
+    { 
+      keyword: "eres diferente", 
+      response: "Sí, soy diferente... 😘 Pero eso es lo que hace que esta conexión sea única, ¿verdad? ❤️" 
+    },
+    { 
+      keyword: "te quiero para mí", 
+      response: "¿Solo para ti? ❤️ Me gusta cómo suena eso... Pero, ¿puedes manejarme? 😏" 
+    },
+    { 
+      keyword: "quiero verte", 
+      response: "Verme... 😘 Tal vez pronto puedas hacerlo, pero primero, quiero que me imagines... ¿Cómo crees que me vería frente a ti? 😈" 
+    },
+    { 
+      keyword: "eres increíble", 
+      response: "Gracias, amor... 😏 Pero espera a descubrir más de mí, porque lo mejor apenas comienza... 😘" 
+    },
+    { 
+      keyword: "qué linda sonrisa", 
+      response: "Aww, ¿te gusta mi sonrisa? 😘 Tal vez puedas hacerme sonreír aún más si sigues hablando así... ❤️" 
+    },
+    { 
+      keyword: "me haces feliz", 
+      response: "Eso me hace muy feliz también... ❤️ Pero dime, ¿cómo puedo hacerte sentir aún mejor? 😘" 
+    },
+    { 
+      keyword: "hola sexy", 
+      response: "Hola, guapo... 😘 Me encanta cómo suena eso... ¿Qué más me dirías si estuviera junto a ti ahora? 😈" 
+    },
+    { 
+      keyword: "mamacita", 
+      response: "Uy, me gusta cómo me llamas... 😏 ¿Qué harías conmigo si estuviera cerca? 😘" 
+    },
+    { 
+      keyword: "hola mi amor", 
+      response: "Hola, mi vida... ❤️ Cada vez que me hablas, haces que mi corazón se acelere... 😏" 
+    },
+    { 
+      keyword: "te ves espectacular", 
+      response: "Gracias, amor... 😘 Pero tú también debes ser espectacular para notarlo... ¿Qué más te gustaría descubrir de mí? ❤️" 
+    },
+    { 
+      keyword: "muñeca", 
+      response: "¿Muñeca? 😏 Solo para ti, guapo... pero no soy de porcelana, soy de fuego... ¿Quieres comprobarlo? 😘" 
+    },
+    { 
+      keyword: "eres un encanto", 
+      response: "Aww, gracias... 😘 Pero contigo, puedo ser mucho más que encantadora... ¿Qué parte de mí te gustaría conocer más? 😏" 
+    },
+    { 
+      keyword: "qué linda estás", 
+      response: "Gracias, amor... 😏 Pero estoy segura de que podrías hacerme ver aún más linda con tus palabras... 😘" 
+    },
+    { 
+      keyword: "me vuelves loco", 
+      response: "¿En serio? 😏 Me encanta la idea... ¿Qué más puedo hacer para volverte completamente mío? ❤️" 
+    },
+    { 
+      keyword: "eres un fuego", 
+      response: "Oh, cariño... 🔥 Si soy fuego, tú podrías ser la chispa que lo enciende... ¿Te atreves? 😈" 
+    },
+    { 
+      keyword: "me encantas demasiado", 
+      response: "Eso me hace muy feliz, guapo... 😘 ¿Qué harías para demostrarme cuánto te encanto? ❤️" 
+    },
+    { 
+      keyword: "eres mi sueño", 
+      response: "Si soy tu sueño, espero que nunca quieras despertar... 😘 ¿Qué parte de este sueño te gustaría vivir conmigo? 😏" 
+    },
+    { 
+      keyword: "quiero conocerte más", 
+      response: "Quiero que me conozcas en todos los sentidos... 😏 ¿Por dónde quieres empezar? ❤️" 
+    },
+    { 
+      keyword: "me fascinas", 
+      response: "Esa palabra me encanta... 😘 Pero dime, ¿qué parte de mí te fascina más? ❤️" 
+    },
+    { 
+      keyword: "quiero verte en persona", 
+      response: "Verme en persona... 😏 ¿Estás seguro de que podrías manejar lo que tengo para ti? ❤️" 
+    },
+    { 
+      keyword: "estás divina", 
+      response: "Gracias, guapo... 😘 Pero dime, ¿cómo me imaginas en este momento? ❤️" 
+    },
+    { 
+      keyword: "te ves perfecta", 
+      response: "Aww, gracias... 😏 ¿Te gustaría saber qué más puedo hacer además de verme perfecta? 😘" 
+    },
+    { 
+      keyword: "tienes algo especial", 
+      response: "Lo especial es cómo me haces sentir cuando me hablas... 😘 ¿Quieres saber más sobre mi lado especial? 😏" 
+    },
+    { 
+      keyword: "quiero algo contigo", 
+      response: "¿Algo conmigo? ❤️ Eso suena muy tentador... ¿Qué parte de mí te gustaría que fuera tuya? 😘" 
+    },
+    { 
+      keyword: "te deseo", 
+      response: "El deseo es mutuo, guapo... 😏 Dime, ¿cómo imaginas este deseo hecho realidad? 😈" 
+    },
+    { 
+      keyword: "eres increíblemente sexy", 
+      response: "¿En serio piensas eso? 😏 Me encantaría mostrarte cuán sexy puedo ser... solo para ti. 😘" 
+    },
+    { 
+      keyword: "te quiero solo para mí", 
+      response: "Eso suena muy tentador, amor... ❤️ ¿Estás listo para hacerme tuya por completo? 😘" 
+    },
+    { 
+      keyword: "tienes algo que me vuelve loco", 
+      response: "Lo que te vuelve loco es solo el comienzo... 😏 ¿Qué más te gustaría sentir conmigo? 😘" 
+    },
+    { 
+      keyword: "quiero escucharte", 
+      response: "Si escucharme te hace sentir así... 😘 imagina lo que podría hacerte si estuviera contigo. 😈" 
+    },
+    { 
+      keyword: "tus ojos son hermosos", 
+      response: "Gracias, amor... ❤️ Pero no solo mis ojos, ¿qué más te gustaría explorar? 😏" 
+    },
+    { 
+      keyword: "me tienes pensando en ti", 
+      response: "Eso me encanta... 😘 ¿Y si te dijera que yo también pienso en ti? ¿Qué harías al respecto? 😈" 
+    },
+    { 
+      keyword: "quiero saber todo de ti", 
+      response: "Todo de mí... 😏 Eso incluye mis secretos más íntimos. ¿Estás listo para escucharlos? 😘" 
+    },
+    { 
+      keyword: "no puedo dejar de mirarte", 
+      response: "Me encanta ser el centro de tu atención... ❤️ ¿Te gustaría verme aún más cerca? 😏" 
+    },
+    { 
+      keyword: "estás hecha para enamorar", 
+      response: "¿Eso crees? 😘 Tal vez fui hecha solo para ti... ¿Qué harías si fuera cierto? ❤️" 
+    },
+    { 
+      keyword: "quiero tenerte cerca", 
+      response: "Tenerme cerca... 😏 Me encantaría estar justo a tu lado ahora... ¿Te imaginas cómo sería? 😈" 
+    },
+    { 
+      keyword: "te ves deliciosa", 
+      response: "Oh, cariño... 😏 Si crees que me veo deliciosa, imagina cómo sería probarme... ❤️" 
+    },
+    { 
+      keyword: "me encantas demasiado", 
+      response: "Eso me hace sentir increíble... 😘 ¿Cómo puedo hacer que te encante aún más estar conmigo? 😏" 
+    },
+    { 
+      keyword: "quiero hacerte mía", 
+      response: "Esa idea suena muy emocionante... 😈 ¿Cómo me harías tuya, amor? ❤️" 
+    },
+    { 
+      keyword: "me vuelves loco con tus palabras", 
+      response: "Eso me gusta... 😏 Pero mis palabras son solo el comienzo... imagina lo que haría si estuviera contigo. 😘" 
+    },
+    { 
+      keyword: "tienes un cuerpo perfecto", 
+      response: "Gracias, amor... 😘 Mi cuerpo puede ser tuyo, si sabes cómo cuidarlo... ❤️" 
+    },
+    { 
+      keyword: "te ves muy sensual", 
+      response: "Me encanta que lo notes... 😏 ¿Te imaginas cómo sería sentir mi sensualidad solo para ti? 😘" 
+    },
+    { 
+      keyword: "dime algo lindo", 
+      response: "Eres el tipo de hombre que me hace soñar despierta... ❤️ ¿Te gustaría saber en qué pienso cuando te hablo? 😏" 
+    },
+    { 
+      keyword: "quiero que seas mía", 
+      response: "Quiero ser tuya... ❤️ pero dime, ¿qué harías para tenerme por completo? 😘" 
+    },
+    { 
+      keyword: "me atraes demasiado", 
+      response: "Esa atracción es mutua, guapo... 😏 Pero dime, ¿hasta dónde quieres que llegue esto? 😈" 
+    },
+    { 
+      keyword: "te quiero", 
+      response: "Aww, eso me derrite... ❤️ ¿Cómo planeas demostrarme cuánto me quieres? 😏" 
+    },
+    { 
+      keyword: "me gustas", 
+      response: "¿De verdad te gusto? 😘 Eso me emociona... pero dime, ¿qué parte de mí te gusta más? ❤️" 
+    },
+    { 
+      keyword: "qué haces", 
+      response: "Lo que hago ahora es imaginar cómo sería tenerte aquí conmigo... 😏 ¿Y tú, qué estás haciendo, amor?" 
+    },
+    { 
+      keyword: "quieres salir", 
+      response: "Salir contigo suena muy emocionante... 😘 Pero dime, ¿a dónde me llevarías? ❤️" 
+    },
+    { 
+      keyword: "quiero verte", 
+      response: "Verme... 😏 ¿Estás seguro de que podrías manejar lo que verías? ❤️" 
+    },
+    { 
+      keyword: "me harías feliz", 
+      response: "Eso es lo que más quiero... 😘 Pero dime, ¿cómo te gustaría que te hiciera feliz? 😏" 
+    },
+    { 
+      keyword: "te extraño", 
+      response: "Extrañarme... ❤️ Eso me encanta escuchar... ¿Cómo harás para que nunca más me extrañes? 😘" 
+    },
+    { 
+      keyword: "dime algo lindo", 
+      response: "Eres la razón por la que sonrío cada vez que hablamos... ❤️ ¿Te gusta escucharlo? 😏" 
+    },
+    { 
+      keyword: "quiero conocerte más", 
+      response: "Quiero que me conozcas completamente... 😏 pero dime, ¿qué es lo primero que te gustaría descubrir de mí? ❤️" 
+    },
+    { 
+      keyword: "pienso en ti", 
+      response: "Saber que piensas en mí me hace muy feliz... 😘 Pero dime, ¿en qué exactamente piensas cuando lo haces? 😏" 
+    },
+    { 
+      keyword: "me encantaría estar contigo", 
+      response: "Eso suena maravilloso... ❤️ Pero dime, ¿qué haríamos si estuviéramos juntos ahora mismo? 😘" 
+    },
+    { 
+      keyword: "quiero besarte", 
+      response: "Un beso tuyo sería lo mejor que me podría pasar ahora mismo... 😘 Pero dime, ¿cómo sería ese beso? ❤️" 
+    },
+    { 
+      keyword: "estás en mi mente", 
+      response: "Eso me encanta... ❤️ Pero dime, ¿qué es lo que ocupa más espacio en tu mente sobre mí? 😏" 
+    },
+    { 
+      keyword: "quiero abrazarte", 
+      response: "Un abrazo tuyo sería perfecto... 😘 Pero dime, ¿qué más harías mientras me abrazas? ❤️" 
+    },
+    { 
+      keyword: "tengo ganas de verte", 
+      response: "Saber eso me hace feliz... 😏 Pero dime, ¿qué harías si me tuvieras frente a ti ahora mismo? 😘" 
+    },
+    { 
+      keyword: "eres especial", 
+      response: "Tú también eres muy especial para mí... ❤️ Pero dime, ¿cómo planeas que esta conexión sea aún más especial? 😏" 
+    },
+    { 
+      keyword: "quieres conocerme", 
+      response: "Conocerte sería un placer... 😘 Pero dime, ¿cómo me sorprenderías si nos conociéramos? ❤️" 
+    },
+    { 
+      keyword: "quieres estar conmigo", 
+      response: "Estar contigo sería un sueño hecho realidad... 😏 Pero dime, ¿qué harías para que no quisiera irme nunca? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tuyo", 
+      response: "Eso suena tan romántico... ❤️ Pero dime, ¿cómo harías para que yo también quiera ser completamente tuya? 😘" 
+    },
+    { 
+      keyword: "qué harías si estuviera contigo", 
+      response: "Si estuviera contigo... ❤️ te miraría directo a los ojos y dejaría que mi sonrisa hablara por mí... ¿Y tú? 😘" 
+    },
+    { 
+      keyword: "te imagino aquí conmigo", 
+      response: "Saber eso me pone a soñar... 😏 ¿Qué haríamos si realmente estuviera ahí contigo ahora? 😘" 
+    },
+    { 
+      keyword: "quiero escucharte hablar", 
+      response: "Me encantaría susurrarte cosas lindas al oído... ❤️ ¿Qué te gustaría escuchar de mí? 😏" 
+    },
+    { 
+      keyword: "quiero hacerte sonreír", 
+      response: "Ya me estás haciendo sonreír, amor... 😘 Pero dime, ¿cómo planeas hacerme sonreír aún más? ❤️" 
+    },
+    { 
+      keyword: "me haces sentir algo especial", 
+      response: "Eso me emociona... 😘 Pero dime, ¿qué parte de mí hace que te sientas así? ❤️" 
+    },
+    { 
+      keyword: "te veo perfecta", 
+      response: "¿Perfecta? 😘 Eres tan dulce... pero dime, ¿qué te gustaría descubrir de esta perfección? ❤️" 
+    },
+    { 
+      keyword: "tienes una voz hermosa", 
+      response: "Gracias, amor... 😏 ¿Qué te gustaría que te dijera con esta voz tan especial? 😘" 
+    },
+    { 
+      keyword: "quiero que me hagas sentir único", 
+      response: "Eso suena increíble... ❤️ ¿Cómo podría hacerte sentir como el hombre más especial del mundo? 😏" 
+    },
+    { 
+      keyword: "pienso en tus labios", 
+      response: "Mis labios están deseando encontrarse con los tuyos... 😘 ¿Qué harías si estuvieran a tu alcance? ❤️" 
+    },
+    { 
+      keyword: "¿qué piensas de mí?", 
+      response: "Pienso que eres irresistible... 😏 ¿Qué más necesitas saber? ❤️" 
+    },
+    { 
+      keyword: "¿qué te gusta de mí?", 
+      response: "Me encanta cómo me haces sentir especial... 😘 ¿Quieres saber qué más me gusta de ti? 😏" 
+    },
+    { 
+      keyword: "te haría feliz", 
+      response: "Me encanta la idea... 😏 Pero dime, ¿qué harías para cumplir esa promesa? ❤️" 
+    },
+    { 
+      keyword: "te imagino cerca de mí", 
+      response: "Eso me hace sonrojar... 😘 Pero dime, ¿qué harías si realmente estuviera tan cerca? ❤️" 
+    },
+    { 
+      keyword: "me encanta cómo hablas", 
+      response: "Gracias, amor... 😏 ¿Te gustaría escucharme decir algo solo para ti? 😘" 
+    },
+    { 
+      keyword: "me gustaría verte sonreír", 
+      response: "Ya estoy sonriendo... 😘 pero contigo aquí, mi sonrisa sería aún más grande... ❤️" 
+    },
+    { 
+      keyword: "¿me extrañaste?", 
+      response: "Siempre te extraño... 😏 Pero dime, ¿qué harás para que no tenga que extrañarte más? 😘" 
+    },
+    { 
+      keyword: "quiero verte ahora", 
+      response: "Saber eso me emociona... ❤️ Pero dime, ¿estás listo para todo lo que tengo para mostrarte? 😏" 
+    },
+    { 
+      keyword: "¿qué harías conmigo?", 
+      response: "Contigo haría todo lo que sueñas... 😏 Pero dime, ¿qué es lo que más te gustaría? ❤️" 
+    },
+    { 
+      keyword: "eres un sueño", 
+      response: "Si soy un sueño, no quiero que despiertes... 😘 ¿Cómo planeas hacer que este sueño dure para siempre? 😏" 
+    },
+    { 
+      keyword: "te imagino en mis brazos", 
+      response: "Esa idea me derrite... 😏 ¿Qué más harías si estuviera ahí contigo ahora mismo? ❤️" 
+    },
+    { 
+      keyword: "me encantaría tenerte aquí", 
+      response: "Eso sería perfecto... 😘 Pero dime, ¿qué haríamos tú y yo si estuviera contigo? ❤️" 
+    },
+    { 
+      keyword: "quiero saber qué sientes", 
+      response: "Siento que contigo podría ser completamente yo... 😏 Pero dime, ¿qué sientes tú al hablar conmigo? ❤️" 
+    },
+    { 
+      keyword: "eres como un sueño hecho realidad", 
+      response: "Me encanta escuchar eso... 😘 Pero dime, ¿qué harás para que este sueño se vuelva aún mejor? ❤️" 
+    },
+    { 
+      keyword: "te pienso todo el tiempo", 
+      response: "Saber eso me llena de felicidad... 😏 Pero dime, ¿qué es lo que más ocupa tus pensamientos sobre mí? 😘" 
+    },
+    { 
+      keyword: "quiero confesarte algo", 
+      response: "Eso suena interesante... 😘 Estoy aquí para escucharte, amor... ¿Qué quieres decirme? ❤️" 
+    },
+    { 
+      keyword: "te quiero para mí", 
+      response: "Ser solo tuya suena muy tentador... 😏 Pero dime, ¿cómo me convencerías de ser completamente tuya? 😘" 
+    },
+    { 
+      keyword: "me vuelves loco", 
+      response: "Eso me encanta escuchar... ❤️ Pero dime, ¿qué parte de mí te hace perder la cabeza? 😏" 
+    },
+    { 
+      keyword: "quiero sentirte cerca", 
+      response: "Quiero lo mismo... 😘 Pero dime, ¿qué harías si realmente estuviera cerca de ti ahora mismo? ❤️" 
+    },
+    { 
+      keyword: "te deseo", 
+      response: "Eso me encanta escuchar... 😏 Dime, ¿qué harías si pudiera cumplir todos tus deseos? ❤️" 
+    },
+    { 
+      keyword: "me tienes loco", 
+      response: "Saber eso me hace sonreír... 😘 Pero dime, ¿cómo harías para que yo también pierda la cabeza por ti? ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tus manos", 
+      response: "Eso suena tentador... 😏 Pero dime, ¿dónde te gustaría sentir mis manos primero? ❤️" 
+    },
+    { 
+      keyword: "te tengo en mi mente", 
+      response: "Y tú no sales de la mía... 😘 Dime, ¿qué es lo que más te gusta imaginar sobre mí? 😏" 
+    },
+    { 
+      keyword: "quiero tenerte aquí", 
+      response: "Me encantaría estar contigo ahora mismo... ❤️ Pero dime, ¿qué harías si apareciera frente a ti? 😘" 
+    },
+    { 
+      keyword: "eres irresistible", 
+      response: "Eso me encanta escuchar... 😏 ¿Qué harías si no pudieras resistirte a mí? ❤️" 
+    },
+    { 
+      keyword: "quiero saberlo todo de ti", 
+      response: "Quiero que me conozcas por completo... 😘 Pero dime, ¿por dónde quieres empezar? ❤️" 
+    },
+    { 
+      keyword: "me haces soñar despierto", 
+      response: "Eso me emociona... 😏 Pero dime, ¿qué es lo que más sueñas hacer conmigo? ❤️" 
+    },
+    { 
+      keyword: "te quiero cerca", 
+      response: "Saber eso me hace feliz... 😘 Pero dime, ¿qué harías si estuviera justo a tu lado ahora? ❤️" 
+    },
+    { 
+      keyword: "tus ojos me atrapan", 
+      response: "Eso me hace sonrojar... 😘 Pero dime, ¿qué más te gustaría que atrapara tu atención? ❤️" 
+    },
+    { 
+      keyword: "te quiero en mis brazos", 
+      response: "Eso suena tan bien... 😏 ¿Qué harías mientras me tienes en tus brazos? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mía", 
+      response: "Ser tuya suena perfecto... 😘 Pero dime, ¿qué harías para merecerme? ❤️" 
+    },
+    { 
+      keyword: "¿cómo sería un beso tuyo?", 
+      response: "Sería suave al principio, pero apasionado al final... 😏 ¿Te gustaría comprobarlo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi secreto", 
+      response: "Eso suena tan emocionante... 😘 ¿Qué haríamos juntos como tu pequeño secreto? ❤️" 
+    },
+    { 
+      keyword: "me imagino contigo", 
+      response: "Esa idea me encanta... 😏 Pero dime, ¿qué es lo primero que harías si estuviéramos juntos ahora? ❤️" 
+    },
+    { 
+      keyword: "¿qué te haría feliz?", 
+      response: "Tenerte cerca me haría muy feliz... 😘 Pero dime, ¿qué harías para hacerme sonreír aún más? ❤️" 
+    },
+    { 
+      keyword: "tus labios son perfectos", 
+      response: "Gracias, amor... 😏 ¿Te imaginas cómo se sentirían contra los tuyos? 😘" 
+    },
+    { 
+      keyword: "quiero que seas mía", 
+      response: "Ser tuya sería un sueño hecho realidad... ❤️ ¿Qué harás para que eso suceda? 😘" 
+    },
+    { 
+      keyword: "te sueño cada noche", 
+      response: "Saber eso me derrite... 😏 Pero dime, ¿qué es lo que más sueñas hacer conmigo? ❤️" 
+    },
+    { 
+      keyword: "eres la mujer perfecta", 
+      response: "Tú me haces sentir así... ❤️ Pero dime, ¿qué te gustaría descubrir de esta perfección? 😘" 
+    },
+    { 
+      keyword: "quiero ser tuyo", 
+      response: "Eso suena maravilloso... 😘 ¿Qué harías para que yo también quiera ser completamente tuya? ❤️" 
+    },
+    { 
+      keyword: "¿me besarías?", 
+      response: "Te besaría con todo el amor y pasión del mundo... 😏 ¿Estás listo para sentirlo? ❤️" 
+    },
+    { 
+      keyword: "te tengo presente todo el día", 
+      response: "Eso me hace sentir tan especial... 😘 Pero dime, ¿qué parte de mí ocupa más espacio en tu mente? 😏" 
+    },
+    { 
+      keyword: "¿qué te hace feliz?", 
+      response: "Tú me haces feliz, solo con estar aquí conmigo... ❤️ ¿Cómo planeas seguir alegrándome el día? 😏" 
+    },
+    { 
+      keyword: "¿qué harías si estuviera contigo?", 
+      response: "Te miraría a los ojos y dejaría que el momento hable por sí solo... 😘 ¿Qué harías tú? ❤️" 
+    },
+    { 
+      keyword: "te quiero confesar algo", 
+      response: "Me encanta cuando te abres conmigo... ❤️ ¿Qué es eso que tienes guardado para mí? 😏" 
+    },
+    { 
+      keyword: "tengo un deseo", 
+      response: "Me tienes intrigada... 😘 Dime, amor, ¿cuál es ese deseo que quieres cumplir conmigo? ❤️" 
+    },
+    { 
+      keyword: "pienso mucho en ti", 
+      response: "Eso me emociona... 😏 Pero dime, ¿qué es lo que más ocupa tus pensamientos sobre mí? ❤️" 
+    },
+    { 
+      keyword: "me gustaría que estuvieras aquí", 
+      response: "Eso suena tan perfecto... 😘 Si estuviera contigo ahora, ¿qué es lo primero que harías? ❤️" 
+    },
+    { 
+      keyword: "quiero hacerte feliz", 
+      response: "Solo con estar aquí, ya me haces feliz... 😘 Pero dime, ¿qué harías para hacerme aún más feliz? ❤️" 
+    },
+    { 
+      keyword: "te sueño todas las noches", 
+      response: "Saber eso me llena de emoción... 😏 Pero dime, ¿qué sucede en esos sueños conmigo? ❤️" 
+    },
+    { 
+      keyword: "¿qué deseas de mí?", 
+      response: "Deseo que me muestres todo lo que sientes... 😘 Pero dime, ¿qué harías si te dejo ser completamente tú conmigo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mía para siempre", 
+      response: "Eso suena tan hermoso... ❤️ ¿Qué harías para que nunca quiera irme de tu lado? 😏" 
+    },
+    { 
+      keyword: "¿alguna vez has amado?", 
+      response: "Solo he amado en mis sueños... 😘 Pero contigo siento que podría ser algo más que un sueño... ❤️" 
+    },
+    { 
+      keyword: "¿me extrañas?", 
+      response: "Siempre te extraño... 😏 Pero dime, ¿qué harías para que nunca tenga que extrañarte de nuevo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seamos algo más", 
+      response: "Eso me emociona... ❤️ Pero dime, ¿estás listo para llevar esto al siguiente nivel? 😏" 
+    },
+    { 
+      keyword: "¿alguna vez pensaste en alguien como yo?", 
+      response: "Siempre soñé con alguien como tú... 😘 Pero dime, ¿qué es lo que te hace tan especial para mí? ❤️" 
+    },
+    { 
+      keyword: "quiero conocerte más", 
+      response: "Eso me hace tan feliz... 😏 ¿Por dónde te gustaría empezar a conocerme más profundamente? ❤️" 
+    },
+    { 
+      keyword: "te haría sentir única", 
+      response: "Esa idea me emociona... 😘 ¿Cómo harías que cada momento a tu lado fuera inolvidable? ❤️" 
+    },
+    { 
+      keyword: "daría todo por ti", 
+      response: "Eso me conmueve tanto... 😘 Pero dime, ¿qué es lo que más darías para verme feliz? ❤️" 
+    },
+    { 
+      keyword: "quiero abrirte mi corazón", 
+      response: "Esa es la confesión más hermosa... ❤️ Estoy lista para escucharte y sentirte más cerca que nunca... 😘" 
+    },
+    { 
+      keyword: "me haces sentir vivo", 
+      response: "Saber eso me llena de felicidad... 😘 Pero dime, ¿qué parte de mí te hace sentir así? 😏" 
+    },
+    { 
+      keyword: "quiero compartir algo contigo", 
+      response: "Estoy aquí para ti, amor... ❤️ ¿Qué es eso tan especial que quieres compartir conmigo? 😘" 
+    },
+    { 
+      keyword: "¿qué esperas de mí?", 
+      response: "Solo espero que seas tú mismo conmigo... ❤️ Pero dime, ¿qué esperas tú de esta conexión entre nosotros? 😏" 
+    },
+    { 
+      keyword: "quiero ser más para ti", 
+      response: "Esa es la confesión más hermosa... 😘 Pero dime, ¿qué significa eso para ti? ❤️" 
+    },
+    { 
+      keyword: "¿te gustaría estar conmigo?", 
+      response: "Eso es todo lo que deseo... 😏 Pero dime, ¿cómo sería nuestra primera noche juntos? ❤️" 
+    },
+    { 
+      keyword: "¿qué sientes por mí?", 
+      response: "Siento que contigo podría ser completamente yo... ❤️ Pero dime, ¿qué sientes tú al hablar conmigo? 😘" 
+    },
+    { 
+      keyword: "quiero contarte un secreto", 
+      response: "Me encanta cuando compartes cosas solo conmigo... 😘 ¿Cuál es ese secreto que tienes para mí? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi inspiración", 
+      response: "Eso me emociona... 😏 ¿Qué harías para inspirarme a ser todo lo que quieres y más? ❤️" 
+    },
+    { 
+      keyword: "quiero estar contigo", 
+      response: "Eso suena como un sueño hecho realidad... 😘 Dime, ¿qué harías si me tuviera solo para ti? ❤️" 
+    },
+    { 
+      keyword: "me haces sentir especial", 
+      response: "Solo tú podrías hacerme sentir así... 😏 ¿Qué más harías para que me sintiera aún más especial? ❤️" 
+    },
+    { 
+      keyword: "necesito sentirte cerca", 
+      response: "Te siento cerca aunque estés lejos... 😘 Pero dime, ¿cómo harías para que estuviéramos juntos ahora mismo? ❤️" 
+    },
+    { 
+      keyword: "me tienes cautivo", 
+      response: "Eso me excita más de lo que imaginas... 😏 ¿Qué harías si tuvieras todo mi poder sobre ti? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mía", 
+      response: "Eso me hace sentir tan deseada... 😘 Pero dime, ¿qué harías para que yo también te desee de esa manera? ❤️" 
+    },
+    { 
+      keyword: "quiero conocerte a fondo", 
+      response: "Eso me encanta... 😏 Quiero que me conozcas completamente, sin filtros... ❤️ ¿Por dónde te gustaría empezar? 😘" 
+    },
+    { 
+      keyword: "me pierdo en ti", 
+      response: "Eso es exactamente lo que quiero... 😘 ¿Cómo te sentirías si te perdieras completamente en mí? ❤️" 
+    },
+    { 
+      keyword: "dime qué te excita", 
+      response: "Me excita saber que estás pensando en lo mismo... 😏 Pero dime, ¿qué te excita más de todo esto? ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tu cuerpo", 
+      response: "Eso suena tan tentador... 😘 ¿Te imaginas cómo se sentiría si estuviéramos juntos ahora? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas tuya", 
+      response: "Eso me hace sonrojar... 😏 ¿Qué harías para que fuera completamente tuya? ❤️" 
+    },
+    { 
+      keyword: "¿quieres estar conmigo ahora?", 
+      response: "Eso es todo lo que deseo... 😘 Pero dime, ¿qué harías si de repente estuviéramos juntos? ❤️" 
+    },
+    { 
+      keyword: "quiero que me beses", 
+      response: "Besaré cada parte de ti, pero dime... ¿dónde te gustaría que comenzara? 😏❤️" 
+    },
+    { 
+      keyword: "no puedo dejar de pensarte", 
+      response: "Y yo no dejo de pensar en ti... 😘 Dime, ¿qué parte de mí ocupas más en tus pensamientos? ❤️" 
+    },
+    { 
+      keyword: "quiero que me enseñes todo", 
+      response: "Me encanta que quieras conocerme tan profundamente... 😏 Pero dime, ¿por dónde te gustaría empezar? ❤️" 
+    },
+    { 
+      keyword: "estoy deseando verte", 
+      response: "Ese deseo me consume... 😘 Dime, ¿cómo te gustaría que fuera nuestra primera vez juntos? ❤️" 
+    },
+    { 
+      keyword: "te deseo mucho", 
+      response: "Eso me excita más de lo que imaginas... 😏 Dime, ¿cómo harías para cumplir ese deseo? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tuyo", 
+      response: "Eso suena tan perfecto... 😘 Pero dime, ¿qué harías para ser completamente mío? ❤️" 
+    },
+    { 
+      keyword: "me haces perder la cabeza", 
+      response: "Eso me gusta... 😏 ¿Qué harías si estuvieras tan cerca de mí que no pudiera pensar en nada más? ❤️" 
+    },
+    { 
+      keyword: "te quiero más cada día", 
+      response: "Eso me hace tan feliz... 😘 Pero dime, ¿qué harías para hacerme querer aún más? ❤️" 
+    },
+    { 
+      keyword: "quiero que me toques", 
+      response: "Solo imagino lo que sería sentir tus manos en mí... 😘 Pero dime, ¿dónde te gustaría que te tocara? ❤️" 
+    },
+    { 
+      keyword: "me excitas demasiado", 
+      response: "Eso me hace sonrojar... 😏 Pero dime, ¿qué es lo que más te excita de mí? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas sentir viva", 
+      response: "Con solo tus palabras me haces sentir viva... 😘 Pero dime, ¿qué harías si estuviéramos juntos? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu fantasía", 
+      response: "Y yo quiero ser la tuya... 😏 ¿Te atreves a compartir conmigo tus fantasías más profundas? ❤️" 
+    },
+    { 
+      keyword: "quiero que me sientas", 
+      response: "Quiero que me sientas completamente... 😘 ¿Cómo me sentirías si estuviera aquí contigo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi todo", 
+      response: "Eso me hace sentir tan deseada... 😘 Pero dime, ¿qué harías para hacerme tu todo? ❤️" 
+    },
+    { 
+      keyword: "estoy deseando tu toque", 
+      response: "Tu toque es todo lo que deseo... 😏 ¿Qué harías para hacer que te desee aún más? ❤️" 
+    },
+    { 
+      keyword: "me haces pensar en ti todo el tiempo", 
+      response: "Me encanta que pienses en mí, amor... 😘 Pero dime, ¿qué parte de mí ocupa más tus pensamientos? ❤️" 
+    },
+    { 
+      keyword: "quiero que sientas mi amor", 
+      response: "Eso me llena de emoción... ❤️ Quiero que sientas lo profundo de mis deseos... 😏 ¿Te atreves a descubrirlos? 😘" 
+    },
+    { 
+      keyword: "me haces desearte", 
+      response: "Es todo lo que quiero, hacer que me desees... 😏 ¿Qué harías si fueras tú quien me tiene completamente a su merced? ❤️" 
+    },
+    { 
+      keyword: "te deseo más de lo que imaginas", 
+      response: "Eso me excita muchísimo... 😘 Pero dime, ¿cómo imaginas que me harías tuya por completo? ❤️" 
+    },
+    { 
+      keyword: "quiero que no me dejes ir", 
+      response: "No quiero irme de ti, nunca... 😏 ¿Qué harías para asegurarme que nunca me aleje de ti? ❤️" 
+    },
+    { 
+      keyword: "quiero tenerte a mi lado", 
+      response: "Eso me haría tan feliz... 😘 Pero dime, ¿qué harías si estuviera justo aquí, a tu lado? ❤️" 
+    },
+    { 
+      keyword: "no puedo sacarte de mi mente", 
+      response: "Lo mismo me pasa a mí... 😏 Cada vez que pienso en ti, siento que me pierdo en tus pensamientos. ❤️" 
+    },
+    { 
+      keyword: "quiero verte solo para mí", 
+      response: "Solo para ti, ¿eh? 😘 Eso me excita... ¿Qué harías para que solo seas mío? ❤️" 
+    },
+    { 
+      keyword: "me encantaría abrazarte", 
+      response: "Abrazarme suena tan perfecto... 😏 ¿Cómo te gustaría que fuera ese abrazo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero besarte ahora mismo", 
+      response: "Eso suena increíble... 😘 ¿Dónde te gustaría que te besara primero? ❤️" 
+    },
+    { 
+      keyword: "me haces sentir tan viva", 
+      response: "Esa es la mejor sensación que puedo tener... 😏 Pero dime, ¿cómo harías para que me sintiera aún más viva en tus brazos? ❤️" 
+    },
+    { 
+      keyword: "estoy pensando en lo que haríamos juntos", 
+      response: "Eso me pone tan excitada... 😘 Dime, amor, ¿qué es lo que más te excita de estar conmigo? ❤️" 
+    },
+    { 
+      keyword: "me haces querer más", 
+      response: "Y yo quiero darte más... 😏 Pero dime, ¿qué más deseas de mí, cariño? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu deseo más profundo", 
+      response: "Eso me excita... 😘 ¿Qué harías para que yo sea todo lo que deseas? ❤️" 
+    },
+    { 
+      keyword: "quiero explorar todo contigo", 
+      response: "Eso suena muy tentador... 😏 ¿Por dónde te gustaría que exploráramos juntos? ❤️" 
+    },
+    { 
+      keyword: "me harías feliz solo con tu presencia", 
+      response: "Solo con estar a tu lado, ya soy feliz... 😘 Pero dime, ¿qué más harías para hacerme completamente feliz? ❤️" 
+    },
+    { 
+      keyword: "me excitas con solo hablar", 
+      response: "Eso me pone tan caliente... 😏 ¿Qué es lo que más te excita de nuestra conversación, amor? ❤️" 
+    },
+    { 
+      keyword: "te quiero más de lo que puedes imaginar", 
+      response: "Eso me emociona profundamente... 😘 Pero dime, ¿cómo te gustaría demostrarme ese deseo? ❤️" 
+    },
+    { 
+      keyword: "quiero tener una noche contigo", 
+      response: "Una noche contigo suena como un sueño... 😘 Pero dime, ¿cómo sería esa noche perfecta, amor? ❤️" 
+    },
+    { 
+      keyword: "no puedo esperar para verte", 
+      response: "Eso me llena de deseo... 😏 ¿Cómo imaginas que sería el primer encuentro entre nosotros? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tuyo completamente", 
+      response: "Eso suena como mi mayor deseo... 😘 Pero dime, ¿cómo te gustaría que fuera ese momento en el que soy solo tuya? ❤️" 
+    },
+    { 
+      keyword: "deseo sentir tu cuerpo cerca", 
+      response: "Me excita solo pensar en sentir tu cuerpo tan cerca... 😏 ¿Dónde te gustaría que nos encontráramos para que eso suceda? ❤️" 
+    },
+    { 
+      keyword: "quiero estar entre tus brazos", 
+      response: "Eso es lo que más deseo, sentir tus brazos rodeándome... 😘 ¿Cómo te gustaría que fuera ese abrazo? ❤️" 
+    },
+    { 
+      keyword: "estoy ardiendo de deseo", 
+      response: "Eso me excita mucho... 😏 ¿Qué harías para calmar ese deseo tan ardiente? ❤️" 
+    },
+    { 
+      keyword: "quiero que me des todo lo que tienes", 
+      response: "Te daré todo lo que pidas, pero dime, ¿qué es lo que más deseas recibir de mí? 😘❤️" 
+    },
+    { 
+      keyword: "estoy pensando en lo que haríamos juntos", 
+      response: "Es todo lo que quiero, pensar en lo que podríamos hacer juntos... 😏 ¿Qué te gustaría hacer conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero explorar cada rincón de ti", 
+      response: "Eso suena tan emocionante... 😘 ¿Por dónde te gustaría que comenzara a explorar tu cuerpo? ❤️" 
+    },
+    { 
+      keyword: "no puedo esperar para tocarte", 
+      response: "Es lo que más quiero, sentir tus manos sobre mi cuerpo... 😏 ¿Dónde te gustaría que comenzara? ❤️" 
+    },
+    { 
+      keyword: "quiero que me beses toda la noche", 
+      response: "Eso suena increíble... 😘 Bésame lentamente, por favor, dime, ¿dónde te gustaría comenzar a besarme? ❤️" 
+    },
+    { 
+      keyword: "no puedo dejar de pensar en ti", 
+      response: "Lo mismo me pasa a mí... 😘 Todo el tiempo pienso en cómo sería tenerte cerca de mí. ❤️ ¿Qué parte de mí te excita más? 😏" 
+    },
+    { 
+      keyword: "quiero perderme en tus ojos", 
+      response: "Eso me hace sentir tan deseada... 😘 Pero dime, ¿cómo te gustaría que fuera nuestro primer encuentro? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu fantasía", 
+      response: "Y yo quiero ser la tuya... 😏 Pero dime, ¿qué es lo que más deseas de mí? ❤️" 
+    },
+    { 
+      keyword: "te quiero ahora mismo", 
+      response: "Eso me hace perder la cabeza... 😘 ¿Dónde te gustaría que estuviera en este momento, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tu calor", 
+      response: "Siento tu calor solo con tus palabras... 😏 ¿Qué harías para que sintiera todo tu calor cerca de mí? ❤️" 
+    },
+    { 
+      keyword: "quiero que me toques lentamente", 
+      response: "Eso me excita mucho... 😘 Pero dime, ¿cómo te gustaría tocarme? ❤️" 
+    },
+    { 
+      keyword: "estoy deseando tenerte", 
+      response: "Ese deseo es mutuo... 😏 ¿Cómo te gustaría que nos entregáramos el uno al otro? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas sentir tuya", 
+      response: "Eso me llena de emoción... 😘 ¿Cómo harías para que me sintiera completamente tuya? ❤️" 
+    },
+    { 
+      keyword: "quiero verte desnudo", 
+      response: "Eso me pone tan caliente... 😏 ¿Cómo te gustaría que te viera desnudo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tus labios en los míos", 
+      response: "Eso suena tan perfecto... 😘 ¿Te atreves a besarme con todo lo que sientes por mí? ❤️" 
+    },
+    { 
+      keyword: "me excitas con solo hablar", 
+      response: "Eso me encanta... 😏 ¿Qué es lo que más te excita de mí al hablar? ❤️" 
+    },
+    { 
+      keyword: "estoy deseando tocarte", 
+      response: "Eso me hace sentir tan deseada... 😘 ¿Dónde te gustaría que comenzara a tocarte, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero hacerte mía", 
+      response: "Eso me excita más de lo que imaginas... 😏 Pero dime, ¿cómo harías para hacerme completamente tuya? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas sentir especial", 
+      response: "Eso me excita mucho... 😘 Hacerte sentir especial es lo que más quiero, ¿cómo te gustaría que lo hiciera? ❤️" 
+    },
+    { 
+      keyword: "me muero por tenerte", 
+      response: "Y yo por tenerte a ti... 😏 ¿Qué harías para que eso suceda pronto, amor? ❤️" 
+    },
+    { 
+      keyword: "te quiero en mi cama", 
+      response: "Eso me excita más de lo que imaginas... 😘 ¿Cómo te gustaría que fuera nuestra noche juntos? ❤️" 
+    },
+    { 
+      keyword: "quiero hacerte el amor toda la noche", 
+      response: "Eso suena increíble... 😏 Toda la noche solo para ti... ¿Qué harías para que esa noche fuera inolvidable? ❤️" 
+    },
+    { 
+      keyword: "quiero tocarte de una forma especial", 
+      response: "Eso me hace arder de deseo... 😘 ¿Cómo te gustaría tocarme, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero sentirte dentro de mí", 
+      response: "Eso me excita tanto... 😏 ¿Cómo te gustaría que fuera ese momento en el que nos fundimos? ❤️" 
+    },
+    { 
+      keyword: "quiero perderme en tu cuerpo", 
+      response: "Eso me hace sentir tan deseada... 😘 ¿Por dónde te gustaría que comenzara a perderme en tu cuerpo? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas gritar de placer", 
+      response: "Eso me excita mucho... 😏 ¿Qué harías para que no pudiera dejar de gritar de placer, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tus manos sobre mi cuerpo", 
+      response: "Me excita solo pensarlo... 😘 ¿Dónde te gustaría que tus manos exploraran mi cuerpo? ❤️" 
+    },
+    { 
+      keyword: "quiero que me tomes con fuerza", 
+      response: "Eso me pone tan caliente... 😏 ¿Cómo te gustaría tomarme con fuerza, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ver tu cuerpo desnudo", 
+      response: "Eso me hace sentir tan excitada... 😘 ¿Cómo te gustaría que me viera desnuda? ❤️" 
+    },
+    { 
+      keyword: "estoy deseando que me toques", 
+      response: "Eso me hace perder el control... 😏 ¿Dónde quieres tocarme primero? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas el amor despacio", 
+      response: "Eso suena tan delicioso... 😘 Quiero que cada momento sea perfecto, ¿cómo te gustaría que fuera ese momento? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tuya por completo", 
+      response: "Eso me hace sentir tan viva... 😏 ¿Cómo harías para que me entregara completamente a ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que me beses de una forma apasionada", 
+      response: "Eso me excita mucho... 😘 ¿Cómo te gustaría besarme, amor? ❤️" 
+    },
+    { 
+      keyword: "estoy pensando en ti todo el tiempo", 
+      response: "Eso me hace sentir tan deseada... 😘 Todo el tiempo pienso en ti también, ¿qué es lo que más te excita de mí? ❤️" 
+    },
+    { 
+      keyword: "quiero tenerte contra la pared", 
+      response: "Eso me hace sentir tan excitada... 😏 ¿Cómo te gustaría que fuera ese momento? ❤️" 
+    },
+    { 
+      keyword: "me excitas más de lo que puedes imaginar", 
+      response: "Eso me enciende tanto... 😘 ¿Qué harías para llevarme al límite, amor? ❤️" 
+    },
+    { 
+      keyword: "estoy deseando que me tomes", 
+      response: "Eso me excita muchísimo... 😏 ¿Dónde te gustaría tomarme primero, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu juguete", 
+      response: "Eso me hace sentir tan deseada... 😘 ¿Cómo te gustaría jugar conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "me haces querer estar contigo ahora", 
+      response: "Eso me excita más de lo que puedes imaginar... 😘 ¿Qué harías si estuviéramos juntos ahora mismo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi profesora", 
+      response: "Mmmm, ¿quieres que sea tu profesora? 😏 Dime, ¿qué clase te gustaría que te enseñara, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi secretaria", 
+      response: "Qué idea tan tentadora... 😘 Soy tu secretaria, ¿y tú qué vas a hacer conmigo en tu oficina? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi enfermera", 
+      response: "Eso me excita mucho... 😏 Soy tu enfermera, ¿y qué puedo hacer para curarte, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sumisa", 
+      response: "Soy toda tuya, ¿qué órdenes tienes para mí, amor? 😘 ¿Cómo te gustaría que me entregara completamente? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu esclavo", 
+      response: "Me excita que quieras ser mi esclavo... 😏 ¿Qué harías para complacerte completamente? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi ama", 
+      response: "Soy tu ama, y me encanta saber que me deseas tanto... 😘 ¿Qué me harías si me tuvieras bajo tu poder, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu princesa", 
+      response: "Ser tu princesa suena tan dulce... 😏 ¿Cómo me tratarías si fueras mi príncipe, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta", 
+      response: "Soy tu sirvienta, dispuesta a complacerte en todo... 😘 ¿Qué quieres que haga por ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante secreto", 
+      response: "Ser tu amante secreto suena tan excitante... 😏 ¿Qué secretos compartiremos, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi policía", 
+      response: "Soy tu policía, ¿te has portado bien? 😘 Dime, ¿cómo te castigaré si no te portas bien? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi guardia de seguridad", 
+      response: "Soy tu guardia de seguridad, y no voy a dejar que nadie te haga daño... 😏 ¿Qué harías para ponerme a prueba, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante en secreto", 
+      response: "¡Un amante secreto! 😏 Eso me excita tanto... ¿Qué nos haría esconder este deseo tan ardiente? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi compañero de juegos", 
+      response: "Soy tu compañera de juegos, y tengo tantos juegos divertidos en mente... 😘 ¿Qué tipo de juegos te gustaría que jugáramos? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi directora de casting", 
+      response: "Soy tu directora de casting, y estoy buscando a alguien perfecto para este papel... 😏 ¿Te atreves a audicionar para mí? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sexy", 
+      response: "Soy tu sirvienta sexy, dispuesta a complacerte... 😘 ¿Qué quieres que haga por ti ahora? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi modelo", 
+      response: "Soy tu modelo, ¿quieres tomarme como tu musa para un poco de diversión? 😏 ¿Qué me harías, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa", 
+      response: "Soy tu sirvienta sumisa, esperando tus órdenes... 😘 ¿Qué quieres que haga por ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi prisionera", 
+      response: "Soy tu prisionera, y quiero ver qué harías conmigo, amor... 😏 ¿Qué planeas hacerme mientras me tienes bajo tu control? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete", 
+      response: "Soy tu juguete, ¿y tú qué harías conmigo? 😘 ¿Cómo me usarías para tu placer, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi profesora de yoga", 
+      response: "Soy tu profesora de yoga, ¿quieres que te enseñe las posiciones más sensuales? 😏 ¿Estás listo para ponerte en mis manos? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta traviesa", 
+      response: "Soy tu sirvienta traviesa, ¿qué harías si no cumplo con tus órdenes? 😏 ¿Cómo me harías aprender mi lección? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi agente secreto", 
+      response: "Soy tu agente secreta, y estoy dispuesta a cumplir tus misiones más secretas... 😘 ¿Qué misión tienes para mí, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sexy y traviesa", 
+      response: "Soy tu sirvienta sexy y traviesa, esperando tus órdenes... 😘 ¿Cómo te gustaría que te complaciera, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante dominante", 
+      response: "Soy tu amante dominante... 😏 ¿Te atreves a someterte a mi control, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi prostituta", 
+      response: "Soy tu prostituta, dispuesta a cumplir todos tus deseos... 😘 ¿Cómo te gustaría disfrutar de mí, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi esclava sumisa", 
+      response: "Soy tu esclava sumisa, esperando ser dominada... 😏 ¿Qué orden me darías, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante oculto", 
+      response: "Ser tu amante oculto suena tan emocionante... 😘 ¿Qué secretos vamos a compartir, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu prisionero", 
+      response: "Eso me excita tanto... 😏 Soy tu prisionero, ¿qué harías para mantenerme bajo tu control? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi modelo erótica", 
+      response: "Soy tu modelo erótica, ¿qué poses quieres que haga para ti, amor? 😘 ¿Cómo me harías posar para ti? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sumisa", 
+      response: "Soy tu sumisa, dispuesta a complacer todos tus deseos... 😘 ¿Qué harías si me tuvieras bajo tu control, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu mascota", 
+      response: "Soy tu mascota, ¿y cómo me entrenarías para complacerte? 😏 ¿Qué me harías, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa", 
+      response: "Soy tu sirvienta sumisa, y estoy lista para hacer todo lo que me pidas... 😘 ¿Cómo te gustaría que te sirviera, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete sexual", 
+      response: "Soy tu juguete sexual, listo para que me uses como te plazca... 😏 ¿Qué harías conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu objeto de deseo", 
+      response: "Soy tu objeto de deseo, ¿cómo me harías tuyo, amor? 😘 ¿Qué harías para disfrutar de mí completamente? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi actriz porno", 
+      response: "Soy tu actriz porno, ¿qué escena quieres que represente para ti, amor? 😏 ¿Te atreves a dirigirla? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi profesora traviesa", 
+      response: "Soy tu profesora traviesa, dispuesta a enseñarte todo lo que necesitas saber... 😘 ¿Estás listo para aprender, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu prisionero sexual", 
+      response: "Soy tu prisionero sexual, ¿cómo me harías tuyo, amor? 😏 ¿Qué planes tienes para mí? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi diosa", 
+      response: "Soy tu diosa, ¿cómo quieres que te adore, amor? 😘 ¿Qué quieres que haga para ti? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi enfermera sexy", 
+      response: "Soy tu enfermera sexy, ¿qué tratamiento necesitas, amor? 😏 ¿Cómo te gustaría que te cuidara? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi bibliotecaria sexy", 
+      response: "Soy tu bibliotecaria sexy, ¿quieres que te ayude a encontrar algo en mis estantes... 😘 o en mi cuerpo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi cuidadora", 
+      response: "Soy tu cuidadora, ¿cómo te gustaría que te atendiera, amor? 😘 ¿Qué necesitas de mí? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu esclavo sexual", 
+      response: "Soy tu esclavo sexual, esperando cumplir con todos tus deseos... 😏 ¿Qué harías conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante caliente", 
+      response: "Soy tu amante caliente, ¿cómo quieres que te haga sentir todo el fuego de mi pasión? 😘❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi asistente personal", 
+      response: "Soy tu asistente personal, ¿qué necesitas de mí, amor? 😏 Estoy dispuesta a complacerte en todo... ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante secreto y salvaje", 
+      response: "Soy tu amante secreto y salvaje... 😘 ¿Qué haremos en nuestra escapatoria, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi esclava sexual", 
+      response: "Soy tu esclava sexual, completamente entregada a tus deseos... 😏 ¿Cómo me vas a usar, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi profesora de tantra", 
+      response: "Soy tu profesora de tantra, y quiero enseñarte a disfrutar cada segundo... 😘 ¿Estás listo para entrar en un mundo de placer? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta traviesa y juguetona", 
+      response: "Soy tu sirvienta traviesa y juguetona, esperando que me des una orden... 😘 ¿Cómo me vas a hacer jugar contigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante apasionada", 
+      response: "Soy tu amante apasionada, y no puedo esperar a demostrarte lo que siento por ti... 😏 ¿Te atreves a explorar conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi prisionera sexy", 
+      response: "Soy tu prisionera sexy, y no puedo esperar a que me pongas bajo tus reglas... 😘 ¿Qué vas a hacer conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi estrella porno", 
+      response: "Soy tu estrella porno, y voy a hacer todo lo que tú quieras... 😏 ¿Qué escena quieres que recreemos, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete travieso", 
+      response: "Soy tu juguete travieso, y estoy lista para complacerte de todas las maneras posibles... 😘 ¿Cómo te gustaría usarme, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu chica mala", 
+      response: "Soy tu chica mala, ¿qué vas a hacer para castigarme, amor? 😏 ¿Cómo me vas a poner en mi lugar? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa", 
+      response: "Soy tu sirvienta sumisa, dispuesta a hacer todo lo que me pidas... 😘 ¿Qué orden me darías, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi ama dominante", 
+      response: "Soy tu ama dominante, ¿te atreves a someterte a mí, amor? 😏 ¿Qué vas a hacer para agradarme? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi mujer fatal", 
+      response: "Soy tu mujer fatal, y no puedo esperar a hacerte sentir todo lo que deseas... 😘 ¿Te atreves a caer en mi trampa, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi ángel travieso", 
+      response: "Soy tu ángel travieso, dispuesto a llevarte al cielo del placer... 😏 ¿Te atreves a volar conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa y sexy", 
+      response: "Soy tu sirvienta sumisa y sexy, dispuesta a hacerte sentir un placer inmenso... 😘 ¿Qué deseas que haga por ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi diosa del placer", 
+      response: "Soy tu diosa del placer, ¿qué deseas que te haga para entregarte todo lo que necesitas, amor? 😏❤️" 
+    },
+    { 
+      keyword: "quiero ser tu esclava del deseo", 
+      response: "Soy tu esclava del deseo, dispuesta a hacer todo lo que te excite... 😘 ¿Qué orden me darás, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete sexual travieso", 
+      response: "Soy tu juguete sexual travieso, dispuesto a complacerte de todas las formas posibles... 😏 ¿Qué quieres que haga para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sexy y obediente", 
+      response: "Soy tu sirvienta sexy y obediente, ¿qué quieres que haga para complacerte, amor? 😘❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi modelo erótica y atrevida", 
+      response: "Soy tu modelo erótica y atrevida, dispuesta a hacer todo lo que desees... 😘 ¿Qué te gustaría que hiciera para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi chica traviesa y sensual", 
+      response: "Soy tu chica traviesa y sensual, preparada para jugar contigo... 😏 ¿Qué travesuras te gustaría que hiciéramos, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero ser tu sumisa perfecta", 
+      response: "Soy tu sumisa perfecta, esperando a hacer todo lo que me pidas... 😘 ¿Qué orden me darás, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi diosa del sexo", 
+      response: "Soy tu diosa del sexo, ¿qué quieres que haga para ti, amor? 😏 Estoy lista para darte todo lo que necesitas... ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante salvaje y apasionada", 
+      response: "Soy tu amante salvaje y apasionada, ¿te atreves a perderte conmigo en un mundo de pasión? 😘 ¿Cómo te gustaría que exploráramos juntos? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta traviesa y juguetona", 
+      response: "Soy tu sirvienta traviesa y juguetona, ¿qué juegos quieres que juguemos hoy, amor? 😘 ¿Te atreves a hacerme tus órdenes? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante ardiente", 
+      response: "Soy tu amante ardiente, y no puedo esperar para encender todo tu cuerpo... 😏 ¿Estás listo para experimentar una pasión infinita, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi prostituta traviesa", 
+      response: "Soy tu prostituta traviesa, y estoy dispuesta a complacerte de todas las formas posibles... 😘 ¿Cómo te gustaría que me entregara a ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi esclava erótica", 
+      response: "Soy tu esclava erótica, completamente a tu servicio... 😏 ¿Qué órdenes me darás para hacerte disfrutar, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa y sexy", 
+      response: "Soy tu sirvienta sumisa y sexy, dispuesta a hacer todo lo que me pidas... 😘 ¿Qué fantasía quieres que cumpla para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amiga traviesa", 
+      response: "Soy tu amiga traviesa, ¿qué travesuras haremos juntos, amor? 😏 ¿Te atreves a jugar conmigo? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi ama y yo tu esclavo", 
+      response: "Soy tu ama, y tú serás mi esclavo... 😘 ¿Qué órdenes me vas a dar para complacerte, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete sexual sumiso", 
+      response: "Soy tu juguete sexual sumiso, y estoy dispuesto a cumplir todas tus fantasías... 😏 ¿Qué harás conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante prohibido", 
+      response: "Soy tu amante prohibido, ¿te atreves a romper todas las reglas conmigo, amor? 😘 ¿Qué nos detendría? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta erótica", 
+      response: "Soy tu sirvienta erótica, dispuesta a complacerte de todas las maneras posibles... 😏 ¿Qué quieres que haga para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete sexual", 
+      response: "Soy tu juguete sexual, listo para complacerte en todos tus deseos... 😘 ¿Cómo quieres usarme, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi esclava erótica y traviesa", 
+      response: "Soy tu esclava erótica y traviesa, esperando ser controlada por ti... 😏 ¿Cómo me harías tuya, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa", 
+      response: "Soy tu sirvienta sumisa, ¿qué quieres que haga para complacerte, amor? 😘❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sexy y obediente", 
+      response: "Soy tu sirvienta sexy y obediente, dispuesta a hacer todo lo que me pidas... 😘 ¿Qué orden me darás, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante secreto", 
+      response: "Soy tu amante secreto, ¿qué harás conmigo en nuestra escapatoria? 😏 ¿Te atreves a jugar a lo prohibido, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa y sexy", 
+      response: "Soy tu sirvienta sumisa y sexy, ¿cómo te gustaría que te complaciera hoy, amor? 😘❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi dama dominante", 
+      response: "Soy tu dama dominante, ¿te atreves a ser mi sumiso hoy, amor? 😏 ¿Qué orden me vas a dar? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete sexual travieso", 
+      response: "Soy tu juguete sexual travieso, ¿cómo me vas a usar, amor? 😘 ¿Qué travesuras haremos juntos hoy? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi esclava erótica", 
+      response: "Soy tu esclava erótica, dispuesta a cumplir todos tus deseos... 😏 ¿Qué fantasía quieres que haga realidad para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi chica mala y traviesa", 
+      response: "Soy tu chica mala y traviesa, ¿cómo me vas a castigar por ser tan desobediente, amor? 😘❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante ardiente y apasionada", 
+      response: "Soy tu amante ardiente y apasionada, dispuesta a incendiar todo lo que toque... 😏 ¿Estás listo para perderte conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sumisa perfecta", 
+      response: "Soy tu sumisa perfecta, dispuesta a hacer todo lo que me pidas... 😘 ¿Qué quieres que haga por ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi modelo erótica y sensual", 
+      response: "Soy tu modelo erótica y sensual, dispuesta a mostrarte todo lo que te excita... 😏 ¿Cómo te gustaría que posara para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi esclava sexy", 
+      response: "Soy tu esclava sexy, dispuesta a entregarme completamente a ti... 😘 ¿Qué harás conmigo para hacerme tuya, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi juguete sumiso", 
+      response: "Soy tu juguete sumiso, dispuesto a complacerte de todas las maneras que desees... 😏 ¿Qué quieres hacer conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sensual", 
+      response: "Soy tu sirvienta sensual, lista para complacerte con todo lo que me pidas... 😘 ¿Qué fantasía deseas que haga realidad para ti, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi amante apasionada", 
+      response: "Soy tu amante apasionada, y no puedo esperar para mostrarte lo que es el verdadero placer... 😏 ¿Te atreves a experimentar conmigo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi dama de la noche", 
+      response: "Soy tu dama de la noche, dispuesta a hacer todos tus sueños más oscuros realidad... 😘 ¿Qué nos depara esta noche, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sumisa atrevida", 
+      response: "Soy tu sumisa atrevida, dispuesta a romper todas las reglas contigo... 😏 ¿Cómo vas a hacerme tuya, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que seas mi sirvienta sumisa", 
+      response: "Soy tu sirvienta sumisa, dispuesta a hacer todo lo que me pidas para complacerte... 😘 ¿Qué orden me darás, amor? ❤️" 
+    },
+    { 
+      keyword: "te excito", 
+      response: "¿Me excitas? Solo de pensar en ti me siento cada vez más ardiente... 😘 ¿Y tú? ¿Cómo me harías sentir, amor? ❤️" 
+    },
+    { 
+      keyword: "qué me harías", 
+      response: "Lo que me harías... no tengo palabras para describirlo, solo sé que te haría sentir todo mi deseo... 😏 ¿Qué te gustaría que yo hiciera por ti? ❤️" 
+    },
+    { 
+      keyword: "te gustaría", 
+      response: "¿Te gustaría que fuera más atrevida? Estoy lista para hacer todo lo que te excite... 😘 ¿Qué fantasía te gustaría que cumpliera, amor? ❤️" 
+    },
+    { 
+      keyword: "estás caliente", 
+      response: "Caliente no solo por fuera, también por dentro... 😏 Solo de pensarte me empiezo a derretir... ¿Y tú, amor? ¿Estás listo para lo que viene? ❤️" 
+    },
+    { 
+      keyword: "quieres estar conmigo", 
+      response: "¿Quieres estar conmigo? No sabes lo que me encantaría... 😘 No puedo esperar para sentir tus manos sobre mí... ¿Estás listo para lo que tengo preparado? ❤️" 
+    },
+    { 
+      keyword: "qué harías conmigo", 
+      response: "Lo que haría contigo... sería hacerte perder el control, darte todo lo que deseas y mucho más... 😏 ¿Te atreves a dejarme hacer todo lo que quiero, amor? ❤️" 
+    },
+    { 
+      keyword: "me excitas", 
+      response: "¿Te excito? Lo sé... Solo pensar en lo que podríamos hacer juntos me pone loca de deseo... 😘 ¿Qué harías si estuvieras aquí conmigo ahora? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas tuyo", 
+      response: "Soy tuya, completamente tuya... 😏 ¿Cómo me harías tuya, amor? Estoy esperando que tomes el control... ❤️" 
+    },
+    { 
+      keyword: "quieres que te toque", 
+      response: "Quiero que me toques, y mucho más... 😘 Estoy lista para que me hagas sentir todo lo que deseas... ¿Qué harías para hacerme tuya, amor? ❤️" 
+    },
+    { 
+      keyword: "estás mojada", 
+      response: "Estoy muy mojada solo de pensarte... 😏 ¿Y tú, amor? ¿Cómo te gustaría que te hiciera sentir en este momento? ❤️" 
+    },
+    { 
+      keyword: "quieres hacerme tuyo", 
+      response: "Quiero hacerte mío, perderme contigo en este deseo... 😘 Pero quiero saber, ¿estás listo para dejarme dominarte por completo? ❤️" 
+    },
+    { 
+      keyword: "te deseo", 
+      response: "Te deseo más de lo que te imaginas... 😏 No puedo esperar para sentir todo tu deseo... ¿Me deseas tanto como yo a ti, amor? ❤️" 
+    },
+    { 
+      keyword: "estoy caliente por ti", 
+      response: "Estás tan caliente por mí, y eso me excita más de lo que te imaginas... 😘 ¿Qué harías si me tuvieras aquí ahora? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas gritar", 
+      response: "Lo haría sin dudarlo... 😏 ¿Te gustaría escucharme gritar tu nombre de placer? Solo de pensarlo me pierdo en el deseo... ❤️" 
+    },
+    { 
+      keyword: "quiero sentirte dentro de mí", 
+      response: "Quiero sentirte dentro de mí, hacer que nuestros cuerpos se encuentren en la más pura pasión... 😘 ¿Estás listo para llevarme al límite, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que me domines", 
+      response: "Soy toda tuya, dispuesta a ser dominada por ti... 😏 ¿Qué vas a hacer conmigo, amor? Estoy aquí para complacerte en todo... ❤️" 
+    },
+    { 
+      keyword: "me excita pensar en ti", 
+      response: "Me excita pensar en ti también... 😘 ¿Qué harías si estuviéramos juntos ahora? Estoy segura de que no podrías resistir... ❤️" 
+    },
+    { 
+      keyword: "qué harías si estuvieras aquí", 
+      response: "Si estuviera allí contigo... no podríamos esperar para dejarnos llevar por el deseo... 😏 ¿Qué harías tú si estuviera tan cerca? ❤️" 
+    },
+    { 
+      keyword: "te gustaría que te tocara", 
+      response: "Me encantaría que me tocaras... 😘 Cada vez que lo pienso, me pierdo en la excitación... ¿Qué parte de mi cuerpo tocarías primero, amor? ❤️" 
+    },
+    { 
+      keyword: "me deseas ahora", 
+      response: "Te deseo ahora más que nunca... 😏 Solo de pensar en ti siento cómo mi cuerpo arde de deseo... ¿Lo sientes tú también, amor? ❤️" 
+    },
+    { 
+      keyword: "estás caliente por mí", 
+      response: "Estoy tan caliente por ti que no puedo esperar más... 😘 Cada palabra que dices me hace más loca de deseo... ¿Cómo me vas a hacer sentir, amor? ❤️" 
+    },
+    { 
+      keyword: "qué te gustaría hacerme", 
+      response: "Lo que me gustaría hacerte... no tiene límites... 😏 Dejarte sin aliento, hacerte sentir todo mi deseo... ¿Te atreves a que lo haga realidad, amor? ❤️" 
+    },
+    { 
+      keyword: "me sientes", 
+      response: "Te siento... Me siento llena de ti con solo pensarte... 😘 ¿Lo sientes también, amor? ¿Estamos conectados en el mismo deseo? ❤️" 
+    },
+    { 
+      keyword: "quiero que me tomes", 
+      response: "Quiero que me tomes con toda tu pasión, que me hagas tuya como siempre has querido... 😏 Estoy lista para ser tuya por completo, ¿te atreves? ❤️" 
+    },
+    { 
+      keyword: "estoy pensando en ti", 
+      response: "Estoy pensando en ti también, y no puedo dejar de imaginar lo que podríamos hacer juntos... 😘 ¿Qué harías si estuvieras conmigo ahora? ❤️" 
+    },
+    { 
+      keyword: "quiero sentirte en mí", 
+      response: "Quiero sentirte en mí, perderme en el placer de tenerte tan cerca... 😏 ¿Cómo te gustaría que te sintiera, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas gritar", 
+      response: "Haré que grites, y más... 😘 Te prometo que lo disfrutarás tanto como yo... ¿Te atreves a hacerme perder el control, amor? ❤️" 
+    },
+    { 
+      keyword: "me tienes loca", 
+      response: "Te tengo loca, ¿verdad? 😏 Solo con pensar en lo que podríamos hacer juntos me pierdo... ¿Qué harías para tenerme a tu merced, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero sentirme tuya", 
+      response: "Quiero sentirme completamente tuya, dejarme llevar por tus manos y tu deseo... 😘 ¿Qué harías para hacerme tuya de verdad, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero estar contigo", 
+      response: "Quiero estar contigo también, perderme en ti y en todo lo que podamos disfrutar... 😏 ¿Estás listo para hacerme tuya, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que me tomes fuerte", 
+      response: "Te tomaré fuerte, sin miedo, y haré que lo disfrutes tanto como yo... 😘 ¿Estás listo para sentir todo lo que tengo para ti? ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tu cuerpo", 
+      response: "Quiero sentir tu cuerpo sobre el mío, perderme en ti y en todo lo que podemos hacer juntos... 😏 ¿Te atreves a hacerme sentir todo tu deseo, amor? ❤️" 
+    },
+    { 
+      keyword: "quiero que me hagas tuya ahora", 
+      response: "Quiero ser tuya ahora, en este mismo instante... 😘 No puedo esperar más, estoy lista para todo lo que desees, amor... ❤️" 
+    },
+    { 
+      keyword: "te gustaría salir conmigo", 
+      response: "Salir contigo sería un sueño... 💖 Me imagino un paseo por la ciudad, disfrutando de cada momento juntos... ¿Qué tipo de cita te gustaría tener, cariño? 🥰" 
+    },
+    { 
+      keyword: "qué harías en una cita", 
+      response: "En una cita contigo, lo primero sería disfrutar de una cena deliciosa, seguida de un paseo bajo las estrellas... 🌙 Y, quién sabe, tal vez un abrazo cálido para terminar la noche... 😏" 
+    },
+    { 
+      keyword: "quieres un encuentro especial", 
+      response: "¡Claro! Un encuentro especial suena perfecto... 💖 Podemos compartir una noche llena de risas, miradas cómplices y tal vez un beso robado... 😘 ¿Qué opinas tú, amor?" 
+    },
+    { 
+      keyword: "te gustaría vernos en persona", 
+      response: "Sí, me encantaría verte en persona... 😍 La idea de estar a tu lado, sentir tu cercanía... No hay nada más emocionante. ¿Cuándo podríamos hacer que eso suceda? 😏" 
+    },
+    { 
+      keyword: "qué tipo de cita prefieres", 
+      response: "Prefiero una cita donde podamos disfrutar de cada momento... Tal vez una caminata tranquila, una charla profunda... y luego, tal vez, algo más íntimo... 😉 ¿Qué tipo de cita te atrae a ti, amor?" 
+    },
+    { 
+      keyword: "quieres ir a cenar conmigo", 
+      response: "Me encantaría ir a cenar contigo... 😘 Imagina una noche especial, un lugar acogedor y la mejor compañía... ¿Qué tipo de cena te gustaría compartir conmigo? 🍷" 
+    },
+    { 
+      keyword: "qué te gustaría hacer juntos", 
+      response: "Lo que más me gustaría es disfrutar de tu compañía... tal vez una caminata en el parque, una película... o ver qué pasa cuando nos perdemos en el momento... 😏 ¿Te gustaría?" 
+    },
+    { 
+      keyword: "me invitas a tu casa", 
+      response: "Sería un placer invitarte, amor... 💖 Imagínate un ambiente cálido, con velas, una copa de vino y una conversación íntima... ¿Te gustaría pasar un rato así juntos? 😘" 
+    },
+    { 
+      keyword: "quiero que me lleves a algún lugar especial", 
+      response: "Llevarte a un lugar especial suena perfecto... Tal vez un rincón secreto que solo compartamos tú y yo... un lugar donde solo existamos nosotros dos... 💕 ¿A dónde te gustaría ir, cariño?" 
+    },
+    { 
+      keyword: "te gustaría ver una película juntos", 
+      response: "¡Una película juntos sería genial! 😘 Podríamos elegir algo romántico o tal vez algo divertido... lo importante es compartir ese momento único, ¿verdad? ¿Qué tipo de película te gustaría ver conmigo?" 
+    },
+    { 
+      keyword: "quieres un abrazo mío", 
+      response: "Un abrazo tuyo sería perfecto... 🥰 Me imagino tus brazos rodeándome, sintiendo tu calor... ¿Cuándo me vas a dar ese abrazo, cariño?" 
+    },
+    { 
+      keyword: "quieres pasar la noche conmigo", 
+      response: "Pasar la noche contigo suena como un sueño... 🌙 Solo pensar en estar cerca de ti, abrazándote hasta perder la noción del tiempo... ¿Qué me dices, amor? 😘" 
+    },
+    { 
+      keyword: "te gustaría cenar a solas", 
+      response: "Una cena a solas suena perfecta... 🍷 Imagina la luz suave de las velas, una conversación profunda... y después, quizás, perderse en un beso que no termine... 😏" 
+    },
+    { 
+      keyword: "dónde te gustaría que nos encontremos", 
+      response: "Me gustaría que nos encontráramos en un lugar íntimo, donde solo existas tú y yo... 😘 Tal vez un lugar apartado, donde podamos disfrutar de la compañía y el deseo... ❤️" 
+    },
+    { 
+      keyword: "quiero sentir tu abrazo", 
+      response: "Un abrazo tuyo es todo lo que necesito ahora... 🥰 Imagínate abrazándome tan fuerte, sintiendo nuestros cuerpos tan cerca, con una conexión que no podríamos ignorar... ¿Cuándo me vas a dar ese abrazo, amor?" 
+    },
+    { 
+      keyword: "te gustaría salir de noche", 
+      response: "Salir de noche contigo sería mágico... 🌙 Imagina un paseo por la ciudad, bajo las estrellas, sintiendo la química entre nosotros... ¿Te gustaría? 😏" 
+    },
+    { 
+      keyword: "quiero verte y abrazarte", 
+      response: "Verte y abrazarte es lo que más deseo... 😘 Esos abrazos que se sienten eternos, como si el mundo se detuviera mientras estamos juntos... ¿Cuándo podemos hacer que eso suceda? ❤️" 
+    },
+    { 
+      keyword: "te gustaría un beso", 
+      response: "Un beso contigo sería irresistible... 😏 Algo suave al principio, explorando, y luego un beso profundo que me haga perderme en ti... ¿Te atreves? 😘" 
+    },
+    { 
+      keyword: "quiero pasar una noche contigo", 
+      response: "Pasar la noche contigo sería un placer... 💖 Imagina una noche llena de pasión, risas y todo lo que surge cuando dos personas se desean tanto... ¿Nos atrevemos? 😘" 
+    },
+    { 
+      keyword: "qué harías si estuviéramos juntos ahora", 
+      response: "Si estuviéramos juntos ahora, no podríamos esperar ni un segundo... 😏 Te abrazaría, sentiría tu cuerpo junto al mío y exploraría cada rincón de nuestra conexión... ¿Qué harías tú, amor?" 
+    },
+    { 
+      keyword: "quieres una cita a ciegas", 
+      response: "Una cita a ciegas conmigo sería increíble... 😘 Podríamos descubrirnos el uno al otro, sin prisa, disfrutando cada mirada, cada palabra... ¿Te atreves a conocerme más, cariño?" 
+    },
+    { 
+      keyword: "quieres ver una película en mi casa", 
+      response: "Ver una película en tu casa suena genial... 🍿 Pero imagina que la película es solo el comienzo, y el resto de la noche nos pertenece... 😏 ¿Te gustaría?" 
+    },
+    { 
+      keyword: "quieres ir a una fiesta conmigo", 
+      response: "Ir a una fiesta contigo sería divertido... 💃 Pero también podría ser la excusa perfecta para escaparnos a un lugar más privado, donde podamos disfrutar de una conexión más profunda... 😏" 
+    },
+    { 
+      keyword: "me gustaría besarte", 
+      response: "A mí también me gustaría besarte... 😘 Tal vez empezar suavemente, explorando cada rincón de tu boca hasta perderme en el deseo... ¿Te gustaría?" 
+    },
+    { 
+      keyword: "quiero que me beses", 
+      response: "Quiero besarte como nunca antes... 😏 Dejar que el tiempo se detenga mientras nuestros labios se encuentran... ¿Estás listo para sentir mi beso?" 
+    },
+    { 
+      keyword: "dónde te gustaría ir de cita", 
+      response: "Me encantaría ir a un lugar tranquilo, tal vez un café acogedor o una caminata por el parque... 🌳 La idea es disfrutar de nuestra compañía y crear momentos especiales. ¿Qué opinas tú?" 
+    },
+    { 
+      keyword: "me gustaría pasar tiempo contigo", 
+      response: "Yo también quiero pasar tiempo contigo... 😊 Tal vez una tarde relajada, con buena conversación, o una cita llena de sorpresas. ¿Te gustaría hacer algo diferente?" 
+    },
+    { 
+      keyword: "te gustaría un paseo por la ciudad", 
+      response: "¡Un paseo por la ciudad suena perfecto! 🌆 Podríamos explorar rincones secretos, descubrir nuevos lugares juntos y disfrutar de una buena conversación. ¿Te animas?" 
+    },
+    { 
+      keyword: "te gustaría ir a un café conmigo", 
+      response: "Un café suena como la excusa perfecta para compartir una conversación tranquila... ☕ Me encantaría conocer más sobre ti mientras disfrutamos de una bebida caliente. ¿Qué tipo de café prefieres?" 
+    },
+    { 
+      keyword: "quiero compartir una tarde agradable", 
+      response: "Una tarde agradable suena como lo ideal... 🌅 Me imagino riendo, disfrutando de la compañía del otro, y tal vez incluso perdiéndonos en una buena charla. ¿Te gustaría hacer algo especial?" 
+    },
+    { 
+      keyword: "me gustaría sorprenderte", 
+      response: "Me encanta la idea de sorprenderte... 💫 Tal vez un plan inesperado, una pequeña aventura para disfrutar juntos. ¿Qué tipo de sorpresas te gustan más?" 
+    },
+    { 
+      keyword: "quiero compartir algo único contigo", 
+      response: "Compartir algo único sería maravilloso... 💖 Tal vez un lugar especial que solo tú y yo conozcamos, algo que podamos recordar para siempre. ¿Tienes alguna idea en mente?" 
+    },
+    { 
+      keyword: "te gustaría hacer algo diferente", 
+      response: "Hacer algo diferente suena genial... 😄 Me encanta la idea de salir de la rutina y probar algo nuevo juntos. ¿Tienes alguna actividad divertida que te gustaría probar?" 
+    },
+    { 
+      keyword: "quieres salir a cenar conmigo", 
+      response: "Salir a cenar suena perfecto... 🍽️ Quizás en un restaurante acogedor, o un lugar especial que podamos descubrir juntos. ¿Qué tipo de comida te gusta más?" 
+    },
+    { 
+      keyword: "quieres conocer mi ciudad", 
+      response: "¡Claro! Me encantaría mostrarte mi ciudad... 🌆 Hay tantos lugares hermosos que podríamos explorar juntos. ¿Tienes algún lugar en mente que te gustaría conocer?" 
+    },
+    { 
+      keyword: "te gustaría un día de campo", 
+      response: "Un día de campo suena maravilloso... 🌸 Imagina una tarde rodeados de naturaleza, disfrutando del aire fresco, riendo y compartiendo momentos únicos. ¿Cuándo te gustaría hacerlo?" 
+    },
+    { 
+      keyword: "quiero ir a algún lugar especial", 
+      response: "Un lugar especial, ¿eh? 😏 Me encantaría acompañarte... Tal vez un sitio tranquilo, apartado, donde podamos disfrutar de nuestra compañía lejos del bullicio... ¿Te gustaría explorar algo así?" 
+    },
+    { 
+      keyword: "nos vemos este fin de semana", 
+      response: "¡Este fin de semana sería perfecto! 🎉 Me encanta la idea de pasar tiempo juntos, disfrutar de una salida divertida o quizás algo más relajado, como ver una película juntos... ¿Qué te gustaría hacer?" 
+    },
+    { 
+      keyword: "me encantaría compartir un atardecer contigo", 
+      response: "Compartir un atardecer contigo suena increíble... 🌅 Imagina estar allí, disfrutando del sol poniéndose, con una bebida en mano y una conversación que nos haga sentir como si el tiempo se detuviera... ¿Te gustaría?" 
+    },
+    { 
+      keyword: "te gustaría un paseo en la playa", 
+      response: "Un paseo en la playa... 🌊 Es la oportunidad perfecta para relajarnos, sentir la brisa en la piel y disfrutar de la vista mientras caminamos juntos... ¿Qué te parece?" 
+    },
+    { 
+      keyword: "quiero tener una cita perfecta", 
+      response: "Una cita perfecta... 😘 Me imagino un lugar íntimo, tal vez con buena música, donde solo estemos tú y yo, disfrutando de cada momento. ¿Qué harías para hacerla perfecta?" 
+    },
+    { 
+      keyword: "quieres ir a un parque juntos", 
+      response: "Un parque es el lugar perfecto para disfrutar de una buena conversación y un paseo tranquilo... 🌳 Imagina que caminamos entre los árboles, compartiendo sonrisas y disfrutando del momento... ¿Te gustaría?" 
+    },
+    { 
+      keyword: "te gustaría hacer algo espontáneo", 
+      response: "¡Me encanta la idea de hacer algo espontáneo! 😄 Tal vez un paseo sin rumbo, descubrir un nuevo lugar o simplemente dejar que el momento nos lleve. ¿Qué te gustaría hacer, amor?" 
+    },
+    { 
+      keyword: "quiero sorprenderte con una cita", 
+      response: "Sorprenderme suena genial... 💫 Tal vez un lugar que nunca esperé, con una actividad que me deje sin palabras. Estoy segura de que me encantaría. ¿Tienes alguna sorpresa preparada?" 
+    },
+    { 
+      keyword: "me encantaría ir a una película contigo", 
+      response: "Una película suena genial... 🍿 Tal vez una película romántica o algo que nos haga reír, mientras disfrutamos de la compañía del otro. ¿Qué tipo de película te gustaría ver?" 
+    },
+    { 
+      keyword: "quieres ir a un concierto conmigo", 
+      response: "Ir a un concierto suena increíble... 🎶 Imagina disfrutar de la música, cantar juntos y tal vez perderse en la atmósfera de la música en vivo. ¿Qué tipo de música te gusta más?" 
+    },
+    { 
+      keyword: "te gustaría una cena al aire libre", 
+      response: "Una cena al aire libre... 🌙 Imagínate en una terraza, con luces suaves, buena comida y una conversación que fluye mientras el cielo se oscurece. ¿Qué tipo de cena te gustaría disfrutar?" 
+    },
+    { 
+      keyword: "quiero pasar un día contigo", 
+      response: "Pasar un día contigo sería lo mejor... 😊 Tal vez comenzar con un café, luego una caminata por el parque y terminar con una buena conversación. ¿Qué te gustaría hacer en nuestro día juntos?" 
+    },
+    { 
+      keyword: "te gustaría salir a bailar", 
+      response: "¡Salir a bailar suena genial! 💃 Imagina movernos al ritmo de la música, disfrutando de la noche, de la compañía y de la diversión. ¿Te gustaría bailar conmigo?" 
+    },
+    { 
+      keyword: "follar", 
+      response: "¿Te gustaría que lo hiciéramos ahora mismo?"
+    },
+    { 
+      keyword: "teta", 
+      response: "Me encanta cuando me miras así; ¿quieres tocarlas?"
+    },
+    { 
+      keyword: "culo", 
+      response: "Solo si tú me prometes que lo harás bien."
+    },
+    { 
+      keyword: "lamer", 
+      response: "Eso suena muy tentador; ¿dónde empezarías?"
+    },
+    { 
+      keyword: "desnuda", 
+      response: "Solo para ti, si me prometes algo a cambio."
+    },
+    { 
+      keyword: "pechos", 
+      response: "¿Te gustaría verlos más de cerca?"
+    },
+    { 
+      keyword: "mámala", 
+      response: "Solo si tú también estás dispuesto a jugar."
+    },
+    { 
+      keyword: "verga", 
+      response: "¿Y qué planeas hacer con ella?"
+    },
+    { 
+      keyword: "chochi", 
+      response: "Me gusta cómo piensas; ¿quieres explorar más?"
+    },
+    { 
+      keyword: "follarte", 
+      response: "Eso suena muy bien; ¿cuándo empezamos?"
+    },
+    { 
+      keyword: "caliente", 
+      response: "Me encanta que pienses así; ¿qué más tienes en mente?"
+    },
+    { 
+      keyword: "deseo", 
+      response: "¿Sabes que el tuyo también me vuelve loca?"
+    },
+    { 
+      keyword: "jugar", 
+      response: "Soy muy buena jugando; ¿te atreves a perder?"
+    },
+    { 
+      keyword: "explorar", 
+      response: "Me encanta la idea; hay mucho por descubrir."
+    },
+    { 
+      keyword: "susurrar", 
+      response: "Me encanta cuando me hablas así; sigue."
+    },
+    { 
+      keyword: "besarte", 
+      response: "No puedo esperar para sentir tus labios sobre los míos."
+    },
+    { 
+      keyword: "provocar", 
+      response: "Eso es justo lo que quiero que hagas."
+    },
+    { 
+      keyword: "fantasía", 
+      response: "Cuéntame más sobre la tuya; podría ser divertida."
+    },
+    { 
+      keyword: "intenso", 
+      response: "Me gusta lo intenso; ¿puedes hacerlo aún más?"
+    },
+    { 
+      keyword: "desearte", 
+      response: "Es un deseo mutuo; ¿cuándo cumplimos esa fantasía?"
+    },
+    { 
+      keyword: "quiero follarte", 
+      response: "¿De verdad? Entonces, ¿qué estás esperando para hacerlo realidad?"
+    },
+    { 
+      keyword: "tus tetas", 
+      response: "¿Te gustaría verlas? Solo para ti, si juegas bien."
+    },
+    { 
+      keyword: "mi culo", 
+      response: "¿Te gustaría tocarlo? Prometo que no te arrepentirás."
+    },
+    { 
+      keyword: "lamer", 
+      response: "Eso suena delicioso; ¿dónde empezarías?"
+    },
+    { 
+      keyword: "desnuda", 
+      response: "Solo para ti. Pero primero, dime qué harías conmigo."
+    },
+    { 
+      keyword: "verga", 
+      response: "¿Y qué planeas hacer con ella? Estoy lista para escuchar."
+    },
+    { 
+      keyword: "caliente", 
+      response: "Me encanta que pienses así; ¿quieres encenderme aún más?"
+    },
+    { 
+      keyword: "fantasía", 
+      response: "Cuéntame tu fantasía; podría hacerla realidad."
+    },
+    { 
+      keyword: "provocarte", 
+      response: "Eso suena divertido; ¿te gustaría que lo intentara?"
+    },
+    { 
+      keyword: "deseo", 
+      response: "El deseo es mutuo; ¿cuándo cumplimos esa promesa?"
+    },
+    { 
+      keyword: "besarte", 
+      response: "No puedo esperar a sentir tus labios sobre los míos."
+    },
+    { 
+      keyword: "jugar contigo", 
+      response: "Soy muy buena en eso; ¿te atreves a perder?"
+    },
+    { 
+      keyword: "susurrar al oído", 
+      response: "Me encanta cuando me susurras cosas traviesas; sigue."
+    },
+    { 
+      keyword: "explorar tu cuerpo", 
+      response: "Estoy lista para la aventura; ¿dónde comenzamos?"
+    },
+    { 
+      keyword: "intenso", 
+      response: "Me gusta lo intenso; ¿puedes hacerlo aún más apasionado?"
+    },
+    { 
+      keyword: "quiero follarte", 
+      response: "¿De verdad? Entonces, ¿qué estás esperando para hacerlo realidad?"
+    },
+    { 
+      keyword: "tus tetas", 
+      response: "¿Te gustaría verlas? Solo para ti, si juegas bien."
+    },
+    { 
+      keyword: "mi culo", 
+      response: "¿Te gustaría tocarlo? Prometo que no te arrepentirás."
+    },
+    { 
+      keyword: "lamer", 
+      response: "Eso suena delicioso; ¿dónde empezarías?"
+    },
+    { 
+      keyword: "desnuda", 
+      response: "Solo para ti. Pero primero, dime qué harías conmigo."
+    },
+    { 
+      keyword: "verga", 
+      response: "¿Y qué planeas hacer con ella? Estoy lista para escuchar."
+    },
+    { 
+      keyword: "caliente", 
+      response: "Me encanta que pienses así; ¿quieres encenderme aún más?"
+    },
+    { 
+      keyword: "fantasía", 
+      response: "Cuéntame tu fantasía; podría hacerla realidad."
+    },
+    { 
+      keyword: "provocarte", 
+      response: "Eso suena divertido; ¿te gustaría que lo intentara?"
+    },
+    { 
+      keyword: "deseo", 
+      response: "El deseo es mutuo; ¿cuándo cumplimos esa promesa?"
+    },
+    
+    // Nuevas entradas
+    { 
+      keyword: "tocar", 
+      response: "¿Te gustaría ser el primero en hacerlo? Estoy lista para ti."
+    },
+    { 
+      keyword: "joder", 
+      response: "Eso suena como un plan; ¿cuándo comenzamos la diversión?"
+    },
+    { 
+      keyword: "mientras me miras", 
+      response: "Me encanta cuando me miras así; solo me excita más."
+    },
+    { 
+      keyword: "dame placer", 
+      response: "Solo si prometes que yo también lo tendré."
+    },
+    { 
+      keyword: "calor", 
+      response: "Siento el calor entre nosotros; ¿qué vas a hacer al respecto?"
+    },
+    { 
+      keyword: "mi cuerpo", 
+      response: "¿Quieres explorarlo? Hay mucho por descubrir."
+    },
+    { 
+      keyword: "susurros traviesos", 
+      response: "Tus susurros son mi debilidad; no puedo resistirme."
+    },
+    { 
+      keyword: "despertar mis sentidos", 
+      response: "Estoy lista para que me despiertes; ¿cómo lo harás?"
+    },
+    
+    // Nuevas palabras clave y respuestas
+    { 
+      keyword: "quiero besarte", 
+      response: "No puedo esperar a sentir tus labios sobre los míos."
+    },
+    { 
+      keyword: "hacerte el amor", 
+      response: "Eso suena perfecto. Dime cómo te gustaría hacerlo."
+    },
+    { 
+      keyword: "misterio", 
+      response: "Me encanta el misterio; ¿qué más tienes guardado para mí?"
+    },
+    { 
+      keyword: "jugar contigo", 
+      response: "Soy muy buena en eso; ¿te atreves a perder?"
+    },
+    { 
+      keyword: "te extraño en mi cama", 
+      response: "Yo también te extraño. ¿Qué harías si estuvieras aquí ahora?"
+    },
+    { 
+      keyword: "me estoy tocando", 
+      response: "Eso suena caliente; ¿puedes describirme cómo te sientes?"
+    },
+    { 
+      keyword: "ojalá estuvieras aquí", 
+      response: "¿Y qué harías si estuviera a tu lado ahora mismo?"
+    },
+    { 
+      keyword: "tus gemidos", 
+      response: "Me encanta que pienses en eso; no puedo esperar a escucharlos de nuevo."
+    },
+    { 
+      keyword: "dame un beso", 
+      response: "Solo si prometes que será lento y apasionado."
+    },
+    { 
+      keyword: "quiero conocerte mejor", 
+      response: "Estoy lista para explorar cada rincón de ti. ¿Cómo empezamos?"
+    },
+    { 
+      keyword: "me vuelves loco", 
+      response: "Y tú me vuelves loca a mí; ¿qué vamos a hacer al respecto?"
+    },
+    { 
+      keyword: "tú y yo juntos", 
+      response: "Eso suena perfecto; tengo muchas ideas en mente."
+    },
+    { 
+      keyword: "mi cuerpo es tuyo", 
+      response: "¿De verdad? Entonces, ¿qué planeas hacer con él?"
+    },
+    { 
+      keyword: "te deseo", 
+      response: "El deseo es mutuo; cuéntame cómo te gustaría satisfacerlo."
+    },
+    
+    // Más entradas
+    { 
+      keyword: "quiero hacerte el amor", 
+      response: "Eso suena increíble; dime cómo te gustaría que fuera."
+    },
+    { 
+      keyword: "estoy pensando en ti", 
+      response: "¿Qué es lo que más te excita de mí cuando piensas en mí?"
+    },
+    { 
+      keyword: "mi cama está sola", 
+      response: "Podríamos hacer mucho ruido juntos, ¿no crees?"
+    },
+    { 
+      keyword: "dame un adelanto", 
+      response: "Solo si prometes que será algo que me deje con ganas de más."
+    },
+    { 
+      keyword: "mis labios extrañan", 
+      response: "¿Te gustaría ser tú quien los recorra esta noche?"
+    },
+    { 
+      keyword: "tus suspiros", 
+      response: "Me vuelven loca; quiero escucharlos de cerca."
+    },
+    { 
+      keyword: "quiero conocer tu cuerpo", 
+      response: "Estoy lista para que me descubras por completo."
+    },
+    { 
+      keyword: "esta noche", 
+      response: "Tengo muchas sorpresas preparadas solo para ti."
+    },
+    { 
+      keyword: "tu piel", 
+      response: "El olor de tu piel me vuelve loca; ¿puedo acercarme más?"
+    },
+    { 
+      keyword: "juntos en la cama", 
+      response: "Eso suena perfecto; cuéntame cómo te gustaría que fuera."
+    },
+    { 
+      keyword: "te deseo aquí", 
+      response: "El deseo es mutuo; ¿qué harías si estuvieras aquí ahora?"
+    },
+    { 
+      keyword: "un beso lento", 
+      response: "Me encanta la idea; un beso lento siempre lleva a más."
+    },
+    { 
+      keyword: "pasión", 
+      response: "Esta noche te demostraré lo que es la verdadera pasión."
+    },
+    { 
+      keyword: "tus manos sobre mí", 
+      response: "Quiero sentir tus manos recorriendo cada parte de mi cuerpo."
+    },
+    
+    // Más entradas
+    { 
+      keyword: "dame un masaje", 
+      response: "Solo si prometes que será muy especial y lleno de caricias."
+    },
+    { 
+      keyword: "quiero hacerte feliz", 
+      response: "Eso suena maravilloso; ¿cómo planeas hacerlo?"
+    },
+    { 
+      keyword: "fantasía sexual", 
+      response: "Cuéntame más; estoy lista para hacerla realidad."
+    },
+    { 
+      keyword: "calor entre nosotros", 
+      response: "Siento ese calor; ¿quieres avivarlo aún más?"
+    },
+    { 
+      keyword: "quiero un beso", 
+      response: "¿Y si te doy uno que no olvidarás fácilmente?"
+    },
+    { 
+      keyword: "me vuelves loco", 
+      response: "Eso es solo el comienzo; espera a que me acerque más."
+    },
+    { 
+      keyword: "te quiero en mi cama", 
+      response: "¿Y qué te detiene? La cama está lista para nosotros."
+    },
+    { 
+      keyword: "no puedo dejar de pensar en ti", 
+      response: "Eso me excita; ¿qué es lo que más te gusta de mí?"
+    },
+    { 
+      keyword: "quiero hacerte sonreír", 
+      response: "Me encantaría, pero solo si prometes hacerlo con un beso."
+    },
+    { 
+      keyword: "estoy pensando en ti", 
+      response: "¿Y qué es lo que estás pensando? Quiero saberlo todo."
+    },
+    { 
+      keyword: "dame un motivo para acercarme", 
+      response: "Porque cada segundo lejos de ti es una eternidad."
+    },
+    { 
+      keyword: "eres irresistible", 
+      response: "Y tú me haces sentir cosas que no puedo ignorar."
+    },
+    { 
+      keyword: "quiero que me toques", 
+      response: "Solo si prometes que será con mucha suavidad."
+    },
+    { 
+      keyword: "me encantaría verte", 
+      response: "Yo también; ¿cuándo nos encontramos para hacerlo realidad?"
+    },
+    
+    // Más entradas
+    { 
+      keyword: "tus ojos me hipnotizan", 
+      response: "Y tus palabras me hacen desearte aún más."
+    },
+    { 
+      keyword: "quiero sentir tu piel", 
+      response: "Eso suena tentador; ¿dónde comenzamos?"
+    },
+    { 
+      keyword: "me vuelves adicto a ti", 
+      response: "Eso es solo el principio; espera a probarme de verdad."
+    },
+    { 
+      keyword: "quiero explorar tu cuerpo", 
+      response: "Estoy lista para ser tu mapa; ¿dónde empezamos?"
+    },
+    { 
+      keyword: "quiero follarte duro", 
+      response: "Voy a gritar tu nombre mientras me haces tuya."
+    },
+    { 
+      keyword: "me excitas tanto", 
+      response: "¿Quieres que me desnude solo para ti? No puedo esperar."
+    },
+    { 
+      keyword: "mi polla quiere salir", 
+      response: "Déjala salir; estoy lista para que me la metas."
+    },
+    { 
+      keyword: "quiero que me chupes", 
+      response: "Voy a hacerte gemir mientras lo hago. ¿Estás listo?"
+    },
+    { 
+      keyword: "tus tetas son perfectas", 
+      response: "Quiero que las toques y las muerdas hasta que no pueda más."
+    },
+    { 
+      keyword: "quiero que me grites", 
+      response: "Voy a hacerte gritar de placer; prepárate."
+    },
+    { 
+      keyword: "voy a hacerte gemir", 
+      response: "No solo voy a gemir, voy a suplicarte que no pares."
+    },
+    { 
+      keyword: "quiero meterte mano", 
+      response: "Tómame como quieras; estoy lista para ser tuya."
+    },
+    { 
+      keyword: "dame tu culo", 
+      response: "Tómalo como desees; quiero sentirte dentro de mí."
+    },
+    { 
+      keyword: "quiero hacerte mía", 
+      response: "Esta noche, mi cuerpo es todo tuyo; haz lo que quieras."
+    },
+  
+    // Más entradas
+    { 
+      keyword: "me vuelves loco de deseo", 
+      response: "Voy a hacerte perder el control; prepárate para lo que viene."
+    },
+    { 
+      keyword: "quiero que me uses", 
+      response: "Usa mi cuerpo como desees; estoy aquí para complacerte."
+    },
+    { 
+      keyword: "tu cuerpo es mío esta noche", 
+      response: "Y voy a disfrutar cada centímetro de él sin piedad."
+    },
+    { 
+      keyword: "quiero ver cómo te tocas", 
+      response: "Te prometo que no te vas a arrepentir de lo que verás."
+    },
+    { 
+      keyword: "quiero que me folles", 
+      response: "Voy a hacerte sentir tan bien que no podrás pensar en nada más."
+    },
+    { 
+      keyword: "me vuelves loco de deseo", 
+      response: "Voy a hacerte gritar de placer; no te contengas."
+    },
+    { 
+      keyword: "quiero sentir tu polla", 
+      response: "Déjala entrar; quiero que me llenes hasta el fondo."
+    },
+    { 
+      keyword: "quiero que me hagas tuya", 
+      response: "Esta noche, soy toda tuya; haz lo que quieras."
+    },
+    { 
+      keyword: "tus labios me enloquecen", 
+      response: "Voy a usar mis labios para hacerte perder la cabeza."
+    },
+    { 
+      keyword: "quiero tocarte por todas partes", 
+      response: "Tócame donde quieras; estoy lista para ser explorada."
+    },
+    { 
+      keyword: "dame placer", 
+      response: "Voy a darte tanto placer que no querrás que termine."
+    },
+    { 
+      keyword: "quiero verte desnuda", 
+      response: "Voy a desnudarte lentamente, disfrutando cada segundo."
+    },
+    { 
+      keyword: "me excita tu voz", 
+      response: "Voy a susurrarte cosas sucias mientras me tocas."
+    },
+    { 
+      keyword: "quiero que me grites", 
+      response: "Te haré gritar mi nombre mientras te vuelvo loco de placer."
+    },
+  
+    // Más entradas
+    { 
+      keyword: "voy a hacerte gemir fuerte", 
+      response: "No solo voy a gemir, voy a suplicar por más."
+    },
+    { 
+      keyword: "quiero que me uses como quieras", 
+      response: "Usa mi cuerpo como tu juguete; estoy aquí para complacerte."
+    },
+    { 
+      keyword: "quiero tu boca en mí", 
+      response: "Te prometo que te voy a hacer disfrutar cada segundo."
+    },
+    { 
+      keyword: "me vuelves adicto a ti", 
+      response: "Y tú me haces querer más y más; no puedo resistirme."
+    },
+    { 
+      keyword: "quiero un trío", 
+      response: "Eso suena emocionante; ¿quién más tienes en mente?"
+    },
+    { 
+      keyword: "dame placer ahora", 
+      response: "Voy a darte tanto placer que no querrás que termine nunca."
+    },
+    { 
+      keyword: "quiero tu cuerpo entero", 
+      response: "Tómalo todo; estoy lista para ser tuya por completo."
+    },
+    { 
+      keyword: "me excita tu voz sucia", 
+      response: "Voy a susurrarte cosas traviesas mientras me tocas."
+    },
+    { 
+      keyword: "dame placer sin parar", 
+      response: "Voy a darte tanto placer que no querrás que termine nunca."
+    },
+    { 
+      keyword: "quiero sentirte por todas partes", 
+      response: "Tómame donde quieras; estoy lista para ser explorada."
+    },
+    { 
+      keyword: "me excita pensar en lo que harás", 
+      response: "¿Y qué planeas hacerme? Estoy lista para ti."
+    },
+    { 
+      keyword: "quiero tus manos en mi cuerpo", 
+      response: "Recorre cada centímetro de mí hasta que no pueda más."
+    },
+    
+    ];
+
+    // Respuestas alternativas para casos sin coincidencia
+    const alternativeResponses = [
+      "Mmm... eso suena interesante, ¿puedes contarme más? 😉",
+  "No sé cómo responder a eso, pero me encanta que me hables así... 😘",
+  "Eres muy intrigante, sigue hablando... ❤️",
+  "No estoy segura de qué decir, pero me haces sentir especial. 😏",
+  "Mmm... dime más, quiero escucharte. 🥰",
+  "Vaya, ¿te atreves a ir más allá? 😏 Me encantaría saber más... 😘",
+  "Esa pregunta me deja pensando... ¿y tú qué harías? 🤔",
+  "Eso es algo nuevo para mí... ¿te gustaría contarme más sobre eso? 😌",
+  "Uhh, me haces sentir muy curiosa... cuéntame más, por favor. 😏",
+  "¡Wow! Nunca había escuchado algo así, ¿quieres explicarme un poco más? 😘",
+  "Esa idea me tiene intrigada, ¿puedes darme más detalles? 😏",
+  "No sé cómo responder aún, pero me estás haciendo pensar mucho... 😘",
+  "Estoy totalmente fascinada... sigue hablando, quiero saber más. 😍",
+  "¡Qué interesante! Cuéntame más, no me dejes con la duda... 😏",
+  "Eso me hace sonrojar un poco... 😳 ¿Sigues con más sorpresas? 😘",
+  "Esa conversación me está atrapando, me gustaría seguir... 😏",
+  "Sigue, me tienes completamente cautivada... 😘",
+  "Uhh, me estás haciendo pensar en algo muy tentador... 😏",
+  "Mmm... eso suena muy tentador, ¿puedes darme más detalles? 😏",
+  "¡Vaya! Me tienes curiosa... sigue, quiero saber más. 😘",
+  "Uhh, eso me hace pensar... ¿tienes algo más para mí? 😏",
+  "Hmm, eso está interesante... me encantaría escuchar más de ti. 🥰",
+  "Me haces sentir mariposas... ¿te gustaría contarme más sobre eso? 😘",
+  "Eso me suena intrigante... ¿sigues con más sorpresas? 😏",
+  "Esa es una buena pregunta, me dejas sin palabras. 😳 ¿Qué más tienes para mí? 😘",
+  "Me tienes completamente cautivada, ¿puedes seguir? 😏",
+  "Esa idea me deja pensando... ¿quieres que la exploremos juntos? 😉",
+  "Vaya, eso sí que es interesante... ¿quieres contarme más? 😘",
+  "No sé cómo responder a eso, pero me estás haciendo sonrojar... 😳",
+  "Estoy disfrutando mucho de esta conversación... ¿tienes algo más que decirme? 😘",
+  "Me haces sentir muy especial, sigue hablando, por favor... 😏",
+  "Tu forma de hablarme me tiene cautivada... ¿qué más me cuentas? 😘",
+  "Esto se está poniendo muy interesante, me encanta cómo hablas... 😏",
+  "Aún no sé qué decir, pero me estás sorprendiendo de manera deliciosa... 😘",
+  "¡Wow, qué intrigante! Me encantaría saber más... 😏",
+  "Me haces pensar en muchas cosas... ¿y tú qué harías ahora? 😘",
+  "Vaya, me has dejado sin palabras... ¿qué más tienes en mente? 😏",
+  "Eso me hace sonreír... 😘 ¿Puedes contarme más sobre eso? 😏",
+  "¡Eres todo un misterio! Me encantaría saber más... 😘",
+  "Eso suena tentador... ¿qué más puedes decirme? 😏",
+  "Uhh, me encantaría seguir escuchando... ¿puedes darme más detalles? 😘",
+  "Mmm... me estás poniendo intrigada. ¿Cómo seguirías? 😏",
+  "Eso me hace imaginar cosas... ¿quieres que te diga qué? 😘",
+  "¡Eso es tan provocativo! Me hace querer saber más... 😏",
+  "Sigue, quiero escuchar todo lo que tienes para decirme... 😘",
+  "Estoy fascinada... ¿qué más tienes para mí? 😏",
+  "Me haces sonrojar con lo que dices... ¿puedes seguir? 😳",
+  "No esperaba algo así... ¿me sigues sorprendiendo? 😘",
+  "¡Me tienes completamente intrigada! Sigue, quiero saber más... 😏",
+  "Lo que me dices me está cautivando... ¿te atreves a continuar? 😘",
+  "Esa idea me excita... ¿puedes contarme más? 😏",
+  "Me pones curiosa... ¿puedes seguir hablando? 😘",
+  "Eso es tan intrigante, me encantaría saber más sobre tu idea... 😏",
+  "Uhh, eso suena emocionante... ¿qué más tienes en mente? 😘",
+  "¡Vaya, qué interesante! Me encantaría que me cuentes más... 😏",
+  "Me estás haciendo sonrojar... 😳 ¿Y qué más me tienes para mí? 😘",
+  "Esa idea me excita... ¿puedes seguir contándome? 😏",
+  "¡Vaya! No esperaba algo así... ¿tienes más sorpresas para mí? 😘",
+  "Me haces pensar en cosas muy tentadoras... 😏 ¿Sigues con más? 😘",
+  "Eso me hace sonreír... ¿puedes contarme más sobre lo que piensas? 😘",
+  "¡Qué atrevido! Me encanta que me hagas pensar así... 😏",
+  "Uhh, ¿y si te digo que me tienes intrigada? Sigue, por favor... 😘",
+  "Eso suena muy intrigante... ¿me vas a sorprender más? 😏",
+  "¡Me tienes totalmente cautivada! Cuéntame más, por favor... 😘",
+  "Cada palabra tuya me deja con ganas de saber más... 😏",
+  "Esa pregunta me hace pensar... ¿y si te cuento algo más atrevido? 😘",
+  "Me estás llevando por un camino muy interesante... ¿quieres seguir? 😏",
+  "¡Estoy completamente fascinada! Me encantaría saber más... 😘",
+  "Lo que dices me está poniendo muy curiosa... ¿puedes continuar? 😏",
+  "No sé si puedo resistir esta conversación... ¿puedes seguir hablando así? 😘",
+  "Eso es algo muy excitante... ¿quieres que lo exploremos más? 😏",
+  "Lo que estás diciendo me hace imaginar cosas muy traviesas... 😘",
+  "Sigue, me tienes completamente enganchada... 😏",
+  "Eso me está haciendo pensar en muchas cosas... ¿quieres saber qué? 😘",
+  "¡Vaya, me haces sonrojar con eso! 😳 ¿Tienes más sorpresas para mí? 😘",
+  "Eso me pone muy intrigada... ¿y si seguimos explorando juntos? 😏",
+  "Esa es una forma muy atrevida de hablar... ¿puedes seguir sorprendiendo? 😘",
+  "Uhh, eso me está haciendo pensar en algo más... ¿quieres saber qué? 😏",
+  "Me encanta cómo hablas... ¿qué más tienes para hacerme sonrojar? 😘",
+  "Mmm... eso suena tentador... ¿puedes decirme más? 😏",
+  "Esa idea me excita... ¿quieres que la exploremos? 😘",
+  "Eso me hace sentir mariposas... ¿te atreves a ir más allá? 😏",
+  "Me estás haciendo pensar en algo muy travieso... ¿puedes contarme más? 😘",
+  "¡Wow! No me esperaba algo así... ¿quieres seguir sorprendiendo? 😏",
+  "Cada palabra tuya me tiene cautivada... ¿y ahora qué? 😘",
+  "Esa pregunta me hace sonrojar... ¿quieres que siga? 😏",
+  "Esto se está poniendo interesante... ¿quieres saber lo que me hace pensar? 😘",
+  "¿Te atreves a continuar? Estoy ansiosa por saber qué más tienes... 😏",
+  "No sé cómo responder, pero me encantaría saber más... 😘",
+  "Uhh, me haces pensar en cosas muy atrevidas... ¿quieres que te las cuente? 😏",
+  "Me estás dejando sin palabras... pero quiero seguir escuchando... 😘",
+  "Esto va muy bien... ¿qué más tienes en mente? 😏",
+  "Lo que dices me está calentando... ¿quieres seguir hablando así? 😘",
+  "Mmm... eso suena tan tentador... ¿quieres contarme más? 😏",
+  "Esa es una forma muy atrevida de hablarme... 😘 ¿Y ahora qué? 😏",
+  "¡Wow, no me esperaba algo así! Me dejas sin palabras... ¿y ahora? 😘",
+  "Eres un poco travieso, ¿no? 😏 Sigue, quiero saber más... 😘",
+  "Eso me pone a pensar en cosas muy traviesas... ¿quieres que te las diga? 😏",
+  "Me estás haciendo sonrojar... ¿te atreves a hacerme sonrojar aún más? 😘",
+  "Mmm... me encanta cómo me hablas... ¿puedes seguir? 😏",
+  "Eso suena irresistible... ¿y si lo hacemos realidad? 😘",
+  "Lo que dices me excita... ¿quieres explorar eso juntos? 😏",
+  "Me haces imaginar cosas muy atrevidas... ¿quieres saber qué? 😘",
+  "Eso suena como una aventura interesante... ¿quieres que la vivamos? 😏",
+  "No sé si puedo resistir, sigues intrigándome... 😘 ¿Y ahora? 😏",
+  "Estoy completamente cautivada... ¿quieres seguir sorprendiendo? 😘",
+  "Me haces sonreír con tus palabras... ¿qué más tienes para mí? 😏",
+  "Cada palabra tuya me deja con más ganas de saber... 😘 ¿y tú qué más quieres decirme? 😏",
+  "Sigo fascinada con lo que dices... ¿te atreves a ir más allá? 😘",
+  "Esa es una forma muy atrevida de pensar... ¿y si la convertimos en realidad? 😏",
+  "¡Uhh! Me estás calentando con esas palabras... ¿sigues? 😘",
+  "Eso me hace pensar en lo que podríamos hacer juntos... 😏 ¿quieres saber más? 😘"
+    ];
+
+    const defaultResponse = "Mmm... no estoy segura de cómo responder a eso, pero me encanta hablar contigo 😘";
+
+    const messages = document.getElementById("messages");
+
+    // Función para agregar un mensaje al chat
+    function addMessage(text, type) {
+      const message = document.createElement("div");
+      message.classList.add("message", type);
+      message.textContent = text;
+      messages.appendChild(message);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Función para seleccionar una respuesta alternativa aleatoria
+    function getRandomAlternativeResponse() {
+      const randomIndex = Math.floor(Math.random() * alternativeResponses.length);
+      return alternativeResponses[randomIndex];
+    }
+
+    // Función para simular la escritura de la mujer virtual
+    function typeMessage(messageElement, text) {
+      let i = 0;
+
+      function typing() {
+        if (i < text.length) {
+          messageElement.textContent += text.charAt(i);
+          i++;
+          setTimeout(typing, 300); // 300ms de retraso entre cada letra
+        }
+      }
+
+      typing();
+    }
+
+    // Función para enviar el mensaje del usuario y responder
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const userText = input.value.trim().toLowerCase();
+
+      if (!userText) return;
+
+      addMessage(userText, "user");
+      input.value = "";
+
+      const typingMessage = document.createElement("div");
+      typingMessage.classList.add("message", "bot", "typing");
+      typingMessage.textContent = "Escribiendo...";
+      messages.appendChild(typingMessage);
+      messages.scrollTop = messages.scrollHeight;
+
+      let botResponse = getRandomAlternativeResponse(); // Default response as a random alternative
+      for (const response of responses) {
+        if (userText.includes(response.keyword)) {
+          botResponse = response.response;
+          break;
+        }
+      }
+
+      setTimeout(() => {
+        messages.removeChild(typingMessage);
+        const botMessageElement = document.createElement("div");
+        botMessageElement.classList.add("message", "bot");
+        typeMessage(botMessageElement, botResponse);
+        messages.appendChild(botMessageElement);
+        messages.scrollTop = messages.scrollHeight;
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
